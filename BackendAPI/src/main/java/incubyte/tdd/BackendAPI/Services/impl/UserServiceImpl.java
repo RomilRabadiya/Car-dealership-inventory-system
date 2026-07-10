@@ -21,6 +21,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse register(RegisterRequest request) {
 
+        if (request == null) {
+            throw new IllegalArgumentException(
+                    "Register request cannot be null."
+            );
+        }
+
         // Add for Test Case : 2 (Authentication)
         if (repository.existsByEmail(request.getEmail())) {
             throw new DuplicateEmailException("Email already exists.");
