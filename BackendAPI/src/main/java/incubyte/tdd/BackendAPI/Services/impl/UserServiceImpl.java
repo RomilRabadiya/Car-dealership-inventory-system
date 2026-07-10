@@ -4,6 +4,7 @@ import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse register(RegisterRequest request) {
 
+        // Add for Test Case : 2 (Authentication)
         if (repository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("User already exists with email: " + request.getEmail());
+            throw new DuplicateEmailException("Email already exists.");
         }
 
         User user = User.builder()
