@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,6 +62,31 @@ class CustomUserDetailsServiceTest {
                         userDetails.getPassword()
                 )
 
+        );
+
+    }
+
+    @Test
+    @DisplayName("TC-020: Should throw UsernameNotFoundException when user does not exist")
+    void shouldThrowUsernameNotFoundException() {
+
+        // Arrange
+        String email = "unknown@gmail.com";
+
+        when(repository.findByEmail(email))
+                .thenReturn(Optional.empty());
+
+        // Act
+        UsernameNotFoundException exception =
+                assertThrows(
+                        UsernameNotFoundException.class,
+                        () -> service.loadUserByUsername(email)
+                );
+
+        // Assert
+        assertEquals(
+                "User not found.",
+                exception.getMessage()
         );
 
     }
