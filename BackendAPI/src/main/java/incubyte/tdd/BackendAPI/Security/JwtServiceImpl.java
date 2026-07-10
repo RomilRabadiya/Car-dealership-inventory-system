@@ -44,4 +44,19 @@ public class JwtServiceImpl implements JwtService {
 
     }
 
+    @Override
+    public String extractUsername(String token) {
+
+        SecretKey key = Keys.hmacShaKeyFor(
+                SECRET.getBytes(StandardCharsets.UTF_8)
+        );
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
 }

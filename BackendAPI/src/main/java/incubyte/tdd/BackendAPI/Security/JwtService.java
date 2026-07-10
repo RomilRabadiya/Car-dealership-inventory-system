@@ -4,4 +4,6 @@ import incubyte.tdd.BackendAPI.Entity.User;
 
 public interface JwtService {
     String generateToken(User user);
+
+    String extractUsername(String token);
 }
