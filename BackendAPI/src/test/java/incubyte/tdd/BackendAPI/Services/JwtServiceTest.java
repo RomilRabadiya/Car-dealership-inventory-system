@@ -109,4 +109,29 @@ class JwtServiceTest {
         // Assert
         assertFalse(valid);
     }
+
+
+    @Test
+    @DisplayName("TC-018: Should reject malformed JWT")
+    void shouldRejectMalformedJwt() {
+
+        // Arrange
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .role(Role.USER)
+                .build();
+
+        String invalidToken = "this-is-not-a-valid-jwt";
+
+        // Act
+        boolean valid = jwtService.isTokenValid(
+                invalidToken,
+                user
+        );
+
+        // Assert
+        assertFalse(valid);
+    }
 }

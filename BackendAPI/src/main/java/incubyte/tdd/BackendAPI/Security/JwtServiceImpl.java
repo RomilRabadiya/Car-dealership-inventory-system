@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
 
 // Service responsible for JWT generation and validation
@@ -58,16 +59,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-
-        SecretKey key = getSigningKey();
-
         // Extract the subject (email) from the JWT token
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return extractClaims(token).getSubject();
     }
 
     // Generate the HMAC signing key from the secret
@@ -107,21 +100,16 @@ public class JwtServiceImpl implements JwtService {
 
     // Extract the expiration date from the JWT token
     private Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
+    }
 
-        SecretKey key = getSigningKey();
-
+    // Extract all claims from the JWT token
+    private Claims extractClaims(String token) {
         return Jwts.parser()
-
-                .verifyWith(key)
-
+                .verifyWith(getSigningKey())
                 .build()
-
                 .parseSignedClaims(token)
-
-                .getPayload()
-
-                .getExpiration();
-
+                .getPayload();
     }
 
 }
