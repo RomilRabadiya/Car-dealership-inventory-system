@@ -3,6 +3,7 @@ package incubyte.tdd.BackendAPI.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
+import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
 import incubyte.tdd.BackendAPI.Services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,5 +125,32 @@ class AuthControllerTest {
                         .value("Invalid email format."))
                 .andExpect(jsonPath("$.errors.password")
                         .value("Password must be at least 8 characters."));
+    }
+
+
+    @Test
+    @DisplayName("TC-010: Should return 409 when email already exists")
+    void shouldReturnConflictWhenEmailAlreadyExists() throws Exception {
+
+        // Arrange
+        RegisterRequest request = new RegisterRequest(
+                "Romil",
+                "romil@gmail.com",
+                "password123"
+        );
+
+        when(service.register(any(RegisterRequest.class)))
+                .thenThrow(new DuplicateEmailException("Email already exists."));
+
+        // Act & Assert
+        mockMvc.perform(
+                        post("/api/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(request))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message")
+                        .value("Email already exists."));
     }
 }
