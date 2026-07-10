@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    // Service layer for user-related operations
     private final UserService service;
 
     /**
@@ -24,19 +23,9 @@ public class AuthController {
      * @return User information with HTTP 201 (Created).
      */
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(
-            @Valid
-            @RequestBody RegisterRequest request
-
-    ) {
-
-        // Delegate registration to the service layer and return the created user
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(service.register(request));
-
     }
-
-
-
 }

@@ -20,17 +20,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse register(RegisterRequest request) {
-
-        if (request == null) {
-            throw new IllegalArgumentException(
-                    "Register request cannot be null."
-            );
-        }
-
-        // Add for Test Case : 2 (Authentication)
-        if (repository.existsByEmail(request.getEmail())) {
-            throw new DuplicateEmailException("Email already exists.");
-        }
+        validateRequestNotNull(request);
+        validateEmailNotExists(request.getEmail());
 
         User user = User.builder()
                 .name(request.getName())
@@ -39,12 +30,27 @@ public class UserServiceImpl implements UserService {
                 .role(Role.USER)
                 .build();
 
-        User saved = repository.save(user);
+        User savedUser = repository.save(user);
+        return mapToUserResponse(savedUser);
+    }
 
+    private void validateRequestNotNull(RegisterRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Register request cannot be null.");
+        }
+    }
+
+    private void validateEmailNotExists(String email) {
+        if (repository.existsByEmail(email)) {
+            throw new DuplicateEmailException("Email already exists.");
+        }
+    }
+
+    private UserResponse mapToUserResponse(User user) {
         return new UserResponse(
-                saved.getId(),
-                saved.getName(),
-                saved.getEmail()
+                user.getId(),
+                user.getName(),
+                user.getEmail()
         );
     }
 }
