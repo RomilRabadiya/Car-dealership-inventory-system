@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
+import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
