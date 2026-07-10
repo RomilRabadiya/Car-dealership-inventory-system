@@ -210,4 +210,68 @@ public class UserServiceTest {
                 // Assert: Verify that the default role assigned is USER
                 assertEquals(Role.USER, capturedUser.getRole());
         }
+
+
+        @Test
+        @DisplayName("TC-005: Should return correct user response after successful registration")
+        void shouldReturnCorrectUserResponse() {
+
+                // Arrange
+                RegisterRequest request = new RegisterRequest(
+                        "Romil",
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+                when(repository.existsByEmail(request.getEmail()))
+                        .thenReturn(false);
+
+                when(encoder.encode(request.getPassword()))
+                        .thenReturn("encryptedPassword");
+
+                User savedUser = User.builder()
+                        .id(1L)
+                        .name("Romil")
+                        .email("romil@gmail.com")
+                        .password("encryptedPassword")
+                        .role(Role.USER)
+                        .build();
+
+                when(repository.save(any(User.class)))
+                        .thenReturn(savedUser);
+
+                // Act
+                UserResponse response = service.register(request);
+
+                // Assert
+                assertAll(
+
+                        () -> assertNotNull(response),
+
+                        () -> assertEquals(1L, response.getId()),
+
+                        () -> assertEquals("Romil", response.getName()),
+
+                        () -> assertEquals("romil@gmail.com", response.getEmail())
+                );
+        }
+
+
+        @Test
+        @DisplayName("TC-006: Should reject null registration request")
+        void shouldRejectNullRegisterRequest() {
+
+                IllegalArgumentException exception =
+                        assertThrows(
+                                IllegalArgumentException.class,
+                                () -> service.register(null)
+                        );
+
+                assertEquals(
+                        "Register request cannot be null.",
+                        exception.getMessage()
+                );
+
+                verifyNoInteractions(repository);
+        }
 }
