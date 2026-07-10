@@ -83,4 +83,30 @@ class JwtServiceTest {
         // Assert: Verify the token is valid for the given user
         assertTrue(valid);
     }
+
+
+    @Test
+    @DisplayName("TC-017: Should reject expired JWT")
+    void shouldRejectExpiredJwt() throws InterruptedException {
+
+        // Arrange
+        jwtService.setExpirationInMillis(1);
+
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .role(Role.USER)
+                .build();
+
+        String token = jwtService.generateToken(user);
+
+        Thread.sleep(5);
+
+        // Act
+        boolean valid = jwtService.isTokenValid(token, user);
+
+        // Assert
+        assertFalse(valid);
+    }
 }

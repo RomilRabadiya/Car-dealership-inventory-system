@@ -17,6 +17,12 @@ public class JwtServiceImpl implements JwtService {
     private static final String SECRET =
             "12345678901234567890123456789012";
 
+    private long expirationInMillis = 3600000;
+
+    public void setExpirationInMillis(long expirationInMillis) {
+        this.expirationInMillis = expirationInMillis;
+    }
+
     @Override
     public String generateToken(User user) {
 
@@ -35,11 +41,11 @@ public class JwtServiceImpl implements JwtService {
                 // Set token creation time
                 .issuedAt(new Date())
 
-                // Set token expiration time (1 hour)
+                // Set token expiration time
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
-                                        + 1000 * 60 * 60
+                                        + expirationInMillis
                         )
                 )
 
@@ -79,11 +85,15 @@ public class JwtServiceImpl implements JwtService {
             User user
     ) {
 
-        // Validate username and ensure the token has not expired
-        String username = extractUsername(token);
+        try {
+            // Validate username and ensure the token has not expired
+            String username = extractUsername(token);
 
-        return username.equals(user.getEmail())
-                && !isTokenExpired(token);
+            return username.equals(user.getEmail())
+                    && !isTokenExpired(token);
+        } catch (io.jsonwebtoken.JwtException e) {
+            return false;
+        }
 
     }
 
