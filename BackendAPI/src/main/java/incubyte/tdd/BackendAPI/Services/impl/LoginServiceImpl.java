@@ -3,6 +3,7 @@ package incubyte.tdd.BackendAPI.Services.impl;
 import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.InvalidCredentialsException;
 import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
@@ -25,10 +26,9 @@ public class LoginServiceImpl implements LoginService {
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
 
-        encoder.matches(
-                request.getPassword(),
-                user.getPassword()
-        );
+        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid email or password.");
+        }
 
         String token = jwtService.generateToken(user);
 
