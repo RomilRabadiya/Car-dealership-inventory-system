@@ -93,13 +93,14 @@ class AuthControllerTest {
     @DisplayName("TC-009: Should return validation error response")
     void shouldReturnValidationErrors() throws Exception {
 
-        RegisterRequest request =
-                new RegisterRequest(
-                        "",
-                        "invalid-email",
-                        "123"
-                );
+        // Arrange: Create an invalid registration request
+        RegisterRequest request = new RegisterRequest(
+                "",
+                "invalid-email",
+                "123"
+        );
 
+        // Act & Assert: Perform the registration request and verify the validation error response
         mockMvc.perform(
                         post("/api/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -108,19 +109,19 @@ class AuthControllerTest {
                                 )
                 )
 
+                // Verify the HTTP status code
                 .andExpect(status().isBadRequest())
 
+                // Verify the general error response
                 .andExpect(jsonPath("$.status").value(400))
-
                 .andExpect(jsonPath("$.message")
                         .value("Validation Failed"))
 
+                // Verify field-specific validation errors
                 .andExpect(jsonPath("$.errors.name")
                         .value("Name is required."))
-
                 .andExpect(jsonPath("$.errors.email")
                         .value("Invalid email format."))
-
                 .andExpect(jsonPath("$.errors.password")
                         .value("Password must be at least 8 characters."));
     }
