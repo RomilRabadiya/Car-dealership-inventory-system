@@ -18,10 +18,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(User user) {
 
-        SecretKey key =
-                Keys.hmacShaKeyFor(
-                        SECRET.getBytes(StandardCharsets.UTF_8)
-                );
+        SecretKey key = getSigningKey();
 
         return Jwts.builder()
 
@@ -47,9 +44,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String extractUsername(String token) {
 
-        SecretKey key = Keys.hmacShaKeyFor(
-                SECRET.getBytes(StandardCharsets.UTF_8)
-        );
+        SecretKey key = getSigningKey();
 
         return Jwts.parser()
                 .verifyWith(key)
@@ -57,6 +52,12 @@ public class JwtServiceImpl implements JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(
+                SECRET.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
 }
