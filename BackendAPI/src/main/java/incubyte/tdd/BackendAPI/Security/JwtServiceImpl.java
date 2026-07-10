@@ -60,4 +60,9 @@ public class JwtServiceImpl implements JwtService {
         );
     }
 
+    @Override
+    public boolean isTokenValid(String token, User user) {
+        return false;
+    }
+
 }

@@ -63,6 +63,25 @@ class JwtServiceTest {
     }
 
 
-    
+    @Test
+    @DisplayName("TC-016: Should validate JWT token")
+    void shouldValidateJwtToken() {
+
+        // Arrange
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .role(Role.USER)
+                .build();
+
+        String token = jwtService.generateToken(user);
+
+        // Act
+        boolean valid = jwtService.isTokenValid(token, user);
+
+        // Assert
+        assertTrue(valid);
+    }
 
 }
