@@ -10,6 +10,7 @@ import incubyte.tdd.BackendAPI.Services.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -105,5 +106,108 @@ public class UserServiceTest {
 
                 // Verify that no user is saved when registration fails
                 verify(repository, never()).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("TC-003: Should encrypt password before saving user")
+        void shouldEncryptPasswordBeforeSavingUser() {
+
+                // Arrange: Create a dummy registration request
+                RegisterRequest request = new RegisterRequest(
+                        "Romil",
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+                // Mock email availability check
+                when(repository.existsByEmail(request.getEmail()))
+                        .thenReturn(false);
+
+                // Mock password encryption
+                when(encoder.encode(request.getPassword()))
+                        .thenReturn("encryptedPassword");
+
+                // Create a mock saved user
+                User savedUser = User.builder()
+                        .id(1L)
+                        .name("Romil")
+                        .email("romil@gmail.com")
+                        .password("encryptedPassword")
+                        .role(Role.USER)
+                        .build();
+
+                // Mock repository save operation
+                when(repository.save(any(User.class)))
+                        .thenReturn(savedUser);
+
+                // Act: Register the user
+                service.register(request);
+
+                // Capture the user object passed to the repository
+                ArgumentCaptor<User> captor =
+                        ArgumentCaptor.forClass(User.class);
+
+                verify(repository).save(captor.capture());
+
+                User capturedUser = captor.getValue();
+
+                // Assert: Verify the password is encrypted before saving
+                assertEquals(
+                        "encryptedPassword",
+                        capturedUser.getPassword()
+                );
+
+                // Assert: Verify the plain-text password is not stored
+                assertNotEquals(
+                        "password123",
+                        capturedUser.getPassword()
+                );
+        }
+
+        @Test
+        @DisplayName("TC-004: Should assign USER role to newly registered user")
+        void shouldAssignUserRoleByDefault() {
+
+                // Arrange: Create a dummy registration request
+                RegisterRequest request = new RegisterRequest(
+                        "Romil",
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+                // Mock email availability check
+                when(repository.existsByEmail(request.getEmail()))
+                        .thenReturn(false);
+
+                // Mock password encryption
+                when(encoder.encode(request.getPassword()))
+                        .thenReturn("encryptedPassword");
+
+                // Create a mock saved user with the default USER role
+                User savedUser = User.builder()
+                        .id(1L)
+                        .name("Romil")
+                        .email("romil@gmail.com")
+                        .password("encryptedPassword")
+                        .role(Role.USER)
+                        .build();
+
+                // Mock repository save operation
+                when(repository.save(any(User.class)))
+                        .thenReturn(savedUser);
+
+                // Act: Register the user
+                service.register(request);
+
+                // Capture the User object passed to the repository
+                ArgumentCaptor<User> captor =
+                        ArgumentCaptor.forClass(User.class);
+
+                verify(repository).save(captor.capture());
+
+                User capturedUser = captor.getValue();
+
+                // Assert: Verify that the default role assigned is USER
+                assertEquals(Role.USER, capturedUser.getRole());
         }
 }
