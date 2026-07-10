@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-
+//Service (Mockito) : Business rules, duplicate email, password encryption, default role
 // Unit tests for UserServiceImpl using JUnit 5 and Mockito
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
