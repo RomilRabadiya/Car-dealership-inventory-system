@@ -22,16 +22,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest request) {
 
-        User user =
-                repository.findByEmail(
-                                request.getEmail()
-                        )
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "User not found."
-                                        )
-                        );
+        User user = repository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
+
         encoder.matches(
                 request.getPassword(),
                 user.getPassword()
