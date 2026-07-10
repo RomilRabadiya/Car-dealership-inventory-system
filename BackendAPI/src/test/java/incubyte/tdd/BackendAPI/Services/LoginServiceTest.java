@@ -4,10 +4,11 @@ import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.InvalidCredentialsException;
 import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
-import incubyte.tdd.BackendAPI.Services.impl.AuthServiceImpl;
+import incubyte.tdd.BackendAPI.Services.impl.LoginServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class LoginServiceTest {
 
     @Mock
     UserRepository repository;
@@ -35,7 +36,7 @@ class AuthServiceTest {
     JwtService jwtService;
 
     @InjectMocks
-    AuthServiceImpl service;
+    LoginServiceImpl service;
 
 
     @Test
@@ -127,6 +128,49 @@ class AuthServiceTest {
         verify(jwtService, never())
                 .generateToken(any());
 
+    }
+
+    @Test
+    @DisplayName("TC-013: Should throw exception for incorrect password")
+    void shouldThrowExceptionForIncorrectPassword() {
+
+        // Arrange
+        LoginRequest request = new LoginRequest(
+                "romil@gmail.com",
+                "wrongPassword"
+        );
+
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .password("encryptedPassword")
+                .role(Role.USER)
+                .build();
+
+        when(repository.findByEmail(request.getEmail()))
+                .thenReturn(Optional.of(user));
+
+        when(encoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        )).thenReturn(false);
+
+        // Act
+        InvalidCredentialsException exception =
+                assertThrows(
+                        InvalidCredentialsException.class,
+                        () -> service.login(request)
+                );
+
+        // Assert
+        assertEquals(
+                "Invalid email or password.",
+                exception.getMessage()
+        );
+
+        verify(jwtService, never())
+                .generateToken(any());
     }
 
 }

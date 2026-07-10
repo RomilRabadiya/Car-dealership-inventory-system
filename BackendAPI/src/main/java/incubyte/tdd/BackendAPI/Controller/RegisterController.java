@@ -2,7 +2,7 @@ package incubyte.tdd.BackendAPI.Controller;
 
 import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
-import incubyte.tdd.BackendAPI.Services.UserService;
+import incubyte.tdd.BackendAPI.Services.RegisterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class RegisterController {
 
-    private final UserService service;
+    private final RegisterService service;
 
     /**
      * Registers a new user.

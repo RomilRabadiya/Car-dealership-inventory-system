@@ -6,14 +6,14 @@ import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
 import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
-import incubyte.tdd.BackendAPI.Services.UserService;
+import incubyte.tdd.BackendAPI.Services.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class RegisterServiceImpl implements RegisterService {
 
     private final UserRepository repository;
     private final PasswordEncoder encoder;

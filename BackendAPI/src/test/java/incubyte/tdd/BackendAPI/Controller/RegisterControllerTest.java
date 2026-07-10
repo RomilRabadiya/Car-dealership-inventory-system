@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
 import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
-import incubyte.tdd.BackendAPI.Services.UserService;
+import incubyte.tdd.BackendAPI.Services.RegisterService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +21,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // Controller (MockMvc) : HTTP status codes, request validation, JSON request/response mapping
 
-// Controller tests for AuthController using MockMvc
-@WebMvcTest(AuthController.class)
-class AuthControllerTest {
+// Controller tests for RegisterController using MockMvc
+@WebMvcTest(RegisterController.class)
+class RegisterControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     // Mock the service layer
     @MockBean
-    UserService service;
+    RegisterService service;
 
     // Convert Java objects to JSON
     @Autowired

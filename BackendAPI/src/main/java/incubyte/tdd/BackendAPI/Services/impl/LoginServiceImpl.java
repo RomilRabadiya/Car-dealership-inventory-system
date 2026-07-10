@@ -6,14 +6,14 @@ import incubyte.tdd.BackendAPI.Entity.User;
 import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
-import incubyte.tdd.BackendAPI.Services.AuthService;
+import incubyte.tdd.BackendAPI.Services.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class LoginServiceImpl implements LoginService {
 
     private final UserRepository repository;
     private final PasswordEncoder encoder;

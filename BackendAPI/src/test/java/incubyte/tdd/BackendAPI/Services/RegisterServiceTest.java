@@ -6,7 +6,7 @@ import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
 import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
-import incubyte.tdd.BackendAPI.Services.impl.UserServiceImpl;
+import incubyte.tdd.BackendAPI.Services.impl.RegisterServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 //Service (Mockito) : Business rules, duplicate email, password encryption, default role
-// Unit tests for UserServiceImpl using JUnit 5 and Mockito
+// Unit tests for RegisterServiceImpl using JUnit 5 and Mockito
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class RegisterServiceTest {
 
         // Mock repository
         @Mock
@@ -35,7 +35,7 @@ public class UserServiceTest {
 
         // Inject mocked dependencies
         @InjectMocks
-        private UserServiceImpl service;
+        private RegisterServiceImpl service;
 
         @Test
         @DisplayName("TC-001: Should register a new user successfully")
