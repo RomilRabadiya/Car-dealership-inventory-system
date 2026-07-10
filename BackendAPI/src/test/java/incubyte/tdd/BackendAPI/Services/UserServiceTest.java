@@ -4,6 +4,7 @@ import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.DuplicateEmailException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Services.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -14,12 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import static org.mockito.Mockito.*;
 
 
 // Unit tests for UserServiceImpl using JUnit 5 and Mockito
@@ -78,5 +76,34 @@ public class UserServiceTest {
 
                 // Verify that the user was saved to the repository
                 verify(repository).save(any(User.class));
+        }
+
+
+        @Test
+        @DisplayName("TC-002: Should throw exception when email already exists")
+        void shouldThrowExceptionWhenEmailAlreadyExists() {
+
+                // Arrange: Create a dummy registration request
+                RegisterRequest request = new RegisterRequest(
+                        "Romil",
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+                // Mock repository to indicate that the email already exists
+                when(repository.existsByEmail(request.getEmail()))
+                        .thenReturn(true);
+
+                // Act & Assert: Verify that DuplicateEmailException is thrown
+                DuplicateEmailException exception = assertThrows(
+                        DuplicateEmailException.class,
+                        () -> service.register(request)
+                );
+
+                // Verify the exception message
+                assertEquals("Email already exists.", exception.getMessage());
+
+                // Verify that no user is saved when registration fails
+                verify(repository, never()).save(any(User.class));
         }
 }
