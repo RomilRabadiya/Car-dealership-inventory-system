@@ -13,17 +13,17 @@ class JwtServiceTest {
 
     private JwtServiceImpl jwtService;
 
+    // Initialize the JWT service before each test
     @BeforeEach
     void setUp() {
-
         jwtService = new JwtServiceImpl();
-
     }
 
     @Test
     @DisplayName("TC-014: Should generate JWT token")
     void shouldGenerateJwtToken() {
 
+        // Arrange: Create a dummy user
         User user = User.builder()
                 .id(1L)
                 .name("Romil")
@@ -31,10 +31,11 @@ class JwtServiceTest {
                 .role(Role.USER)
                 .build();
 
+        // Act: Generate a JWT token
         String token = jwtService.generateToken(user);
 
+        // Assert: Verify the generated token is not null or empty
         assertNotNull(token);
-
         assertFalse(token.isBlank());
     }
 
@@ -42,7 +43,7 @@ class JwtServiceTest {
     @DisplayName("TC-015: Should extract username from JWT")
     void shouldExtractUsernameFromJwt() {
 
-        // Arrange
+        // Arrange: Create a dummy user and generate a JWT token
         User user = User.builder()
                 .id(1L)
                 .name("Romil")
@@ -52,22 +53,21 @@ class JwtServiceTest {
 
         String token = jwtService.generateToken(user);
 
-        // Act
+        // Act: Extract the username (email) from the JWT token
         String username = jwtService.extractUsername(token);
 
-        // Assert
+        // Assert: Verify the extracted username matches the user's email
         assertEquals(
                 "romil@gmail.com",
                 username
         );
     }
 
-
     @Test
     @DisplayName("TC-016: Should validate JWT token")
     void shouldValidateJwtToken() {
 
-        // Arrange
+        // Arrange: Create a dummy user and generate a JWT token
         User user = User.builder()
                 .id(1L)
                 .name("Romil")
@@ -77,11 +77,10 @@ class JwtServiceTest {
 
         String token = jwtService.generateToken(user);
 
-        // Act
+        // Act: Validate the generated JWT token
         boolean valid = jwtService.isTokenValid(token, user);
 
-        // Assert
+        // Assert: Verify the token is valid for the given user
         assertTrue(valid);
     }
-
 }

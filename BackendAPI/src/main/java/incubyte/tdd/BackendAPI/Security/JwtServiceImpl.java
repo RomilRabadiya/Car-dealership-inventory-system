@@ -9,25 +9,33 @@ import java.util.Date;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+// Service responsible for JWT generation and validation
 @Service
 public class JwtServiceImpl implements JwtService {
 
+    // Secret key used to sign and verify JWT tokens
     private static final String SECRET =
             "12345678901234567890123456789012";
 
     @Override
     public String generateToken(User user) {
 
+        // Generate the signing key
         SecretKey key = getSigningKey();
 
+        // Create and sign the JWT token
         return Jwts.builder()
 
+                // Store the user's email as the subject
                 .subject(user.getEmail())
 
+                // Include the user's role as a custom claim
                 .claim("role", user.getRole().name())
 
+                // Set token creation time
                 .issuedAt(new Date())
 
+                // Set token expiration time (1 hour)
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
@@ -35,6 +43,7 @@ public class JwtServiceImpl implements JwtService {
                         )
                 )
 
+                // Sign the token
                 .signWith(key)
 
                 .compact();
@@ -46,6 +55,7 @@ public class JwtServiceImpl implements JwtService {
 
         SecretKey key = getSigningKey();
 
+        // Extract the subject (email) from the JWT token
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
@@ -54,15 +64,54 @@ public class JwtServiceImpl implements JwtService {
                 .getSubject();
     }
 
+    // Generate the HMAC signing key from the secret
     private SecretKey getSigningKey() {
+
         return Keys.hmacShaKeyFor(
                 SECRET.getBytes(StandardCharsets.UTF_8)
         );
+
     }
 
     @Override
-    public boolean isTokenValid(String token, User user) {
-        return false;
+    public boolean isTokenValid(
+            String token,
+            User user
+    ) {
+
+        // Validate username and ensure the token has not expired
+        String username = extractUsername(token);
+
+        return username.equals(user.getEmail())
+                && !isTokenExpired(token);
+
+    }
+
+    // Check whether the JWT token has expired
+    private boolean isTokenExpired(String token) {
+
+        return extractExpiration(token)
+                .before(new Date());
+
+    }
+
+    // Extract the expiration date from the JWT token
+    private Date extractExpiration(String token) {
+
+        SecretKey key = getSigningKey();
+
+        return Jwts.parser()
+
+                .verifyWith(key)
+
+                .build()
+
+                .parseSignedClaims(token)
+
+                .getPayload()
+
+                .getExpiration();
+
     }
 
 }
