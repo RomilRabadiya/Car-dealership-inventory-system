@@ -7,8 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JwtServiceTest {
 
@@ -37,6 +36,30 @@ class JwtServiceTest {
         assertNotNull(token);
 
         assertFalse(token.isBlank());
+    }
+
+    @Test
+    @DisplayName("TC-015: Should extract username from JWT")
+    void shouldExtractUsernameFromJwt() {
+
+        // Arrange
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .role(Role.USER)
+                .build();
+
+        String token = jwtService.generateToken(user);
+
+        // Act
+        String username = jwtService.extractUsername(token);
+
+        // Assert
+        assertEquals(
+                "romil@gmail.com",
+                username
+        );
     }
 
 }
