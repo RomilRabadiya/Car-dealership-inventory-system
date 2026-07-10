@@ -3,6 +3,7 @@ package incubyte.tdd.BackendAPI.Services.impl;
 import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.AuthService;
@@ -21,8 +22,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest request) {
 
-        User user = repository.findByEmail(request.getEmail()).get();
-
+        User user =
+                repository.findByEmail(
+                                request.getEmail()
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new UserNotFoundException(
+                                                "User not found."
+                                        )
+                        );
         encoder.matches(
                 request.getPassword(),
                 user.getPassword()

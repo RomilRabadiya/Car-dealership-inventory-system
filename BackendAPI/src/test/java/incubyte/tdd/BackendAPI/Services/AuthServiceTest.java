@@ -4,6 +4,7 @@ import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.impl.AuthServiceImpl;
@@ -17,10 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -95,6 +95,37 @@ class AuthServiceTest {
                 )
 
         );
+
+    }
+
+    @Test
+    @DisplayName("TC-012: Should throw exception when email does not exist")
+    void shouldThrowExceptionWhenEmailDoesNotExist() {
+
+        // Arrange
+        LoginRequest request =
+                new LoginRequest(
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+        when(repository.findByEmail(request.getEmail()))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        UserNotFoundException exception =
+                assertThrows(
+                        UserNotFoundException.class,
+                        () -> service.login(request)
+                );
+
+        assertEquals(
+                "User not found.",
+                exception.getMessage()
+        );
+
+        verify(jwtService, never())
+                .generateToken(any());
 
     }
 
