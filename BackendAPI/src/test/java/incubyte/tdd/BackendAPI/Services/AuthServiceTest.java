@@ -1,0 +1,99 @@
+package incubyte.tdd.BackendAPI.Services;
+
+import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
+import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
+import incubyte.tdd.BackendAPI.Entity.Role;
+import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Repository.UserRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class AuthServiceTest {
+
+    @Mock
+    UserRepository repository;
+
+    @Mock
+    PasswordEncoder encoder;
+
+    @Mock
+    JwtService jwtService;
+
+    @InjectMocks
+    AuthServiceImpl service;
+
+
+    @Test
+    @DisplayName("TC-011: Should login successfully")
+    void shouldLoginSuccessfully() {
+
+        // Arrange
+
+        LoginRequest request =
+                new LoginRequest(
+                        "romil@gmail.com",
+                        "password123"
+                );
+
+        User user =
+                User.builder()
+
+                        .id(1L)
+
+                        .name("Romil")
+
+                        .email("romil@gmail.com")
+
+                        .password("encryptedPassword")
+
+                        .role(Role.USER)
+
+                        .build();
+
+        when(repository.findByEmail(request.getEmail()))
+                .thenReturn(Optional.of(user));
+
+        when(
+                encoder.matches(
+                        request.getPassword(),
+                        user.getPassword()
+                )
+        ).thenReturn(true);
+
+        when(jwtService.generateToken(user))
+                .thenReturn("jwt-token");
+
+        // Act
+
+        LoginResponse response =
+                service.login(request);
+
+        // Assert
+
+        assertAll(
+
+                () -> assertNotNull(response),
+
+                () -> assertEquals(
+                        "jwt-token",
+                        response.getToken()
+                )
+
+        );
+
+    }
+
+}
