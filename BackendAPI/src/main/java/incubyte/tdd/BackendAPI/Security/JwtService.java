@@ -1,0 +1,7 @@
+package incubyte.tdd.BackendAPI.Security;
+
+import incubyte.tdd.BackendAPI.Entity.User;
+
+public interface JwtService {
+    String generateToken(User user);
+}

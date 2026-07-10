@@ -5,6 +5,8 @@ import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
+import incubyte.tdd.BackendAPI.Security.JwtService;
+import incubyte.tdd.BackendAPI.Services.impl.AuthServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
