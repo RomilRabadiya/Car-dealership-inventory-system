@@ -88,4 +88,40 @@ class AuthControllerTest {
                 )
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("TC-009: Should return validation error response")
+    void shouldReturnValidationErrors() throws Exception {
+
+        RegisterRequest request =
+                new RegisterRequest(
+                        "",
+                        "invalid-email",
+                        "123"
+                );
+
+        mockMvc.perform(
+                        post("/api/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        mapper.writeValueAsString(request)
+                                )
+                )
+
+                .andExpect(status().isBadRequest())
+
+                .andExpect(jsonPath("$.status").value(400))
+
+                .andExpect(jsonPath("$.message")
+                        .value("Validation Failed"))
+
+                .andExpect(jsonPath("$.errors.name")
+                        .value("Name is required."))
+
+                .andExpect(jsonPath("$.errors.email")
+                        .value("Invalid email format."))
+
+                .andExpect(jsonPath("$.errors.password")
+                        .value("Password must be at least 8 characters."));
+    }
 }

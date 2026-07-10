@@ -3,6 +3,7 @@ package incubyte.tdd.BackendAPI.Controller;
 import incubyte.tdd.BackendAPI.Dto.Request.RegisterRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.UserResponse;
 import incubyte.tdd.BackendAPI.Services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
-
+            @Valid
             @RequestBody RegisterRequest request
 
     ) {
@@ -35,5 +36,7 @@ public class AuthController {
                 .body(service.register(request));
 
     }
+
+
 
 }
