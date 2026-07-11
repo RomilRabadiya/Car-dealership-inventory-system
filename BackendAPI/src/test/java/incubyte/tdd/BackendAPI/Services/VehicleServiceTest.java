@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,7 +67,6 @@ class VehicleServiceTest {
 
     }
 
-
     @Test
     @DisplayName("TC-032: Should reject duplicate vehicle")
     void shouldRejectDuplicateVehicle() {
@@ -82,25 +82,20 @@ class VehicleServiceTest {
 
         when(repository.existsByMakeAndModel(
                 vehicle.getMake(),
-                vehicle.getModel()
-        )).thenReturn(true);
+                vehicle.getModel())).thenReturn(true);
 
         // Act
-        DuplicateVehicleException exception =
-                assertThrows(
-                        DuplicateVehicleException.class,
-                        () -> service.addVehicle(vehicle)
-                );
+        DuplicateVehicleException exception = assertThrows(
+                DuplicateVehicleException.class,
+                () -> service.addVehicle(vehicle));
 
         // Assert
         assertEquals(
                 "Vehicle already exists.",
-                exception.getMessage()
-        );
+                exception.getMessage());
 
         verify(repository, never()).save(any());
     }
-
 
     @Test
     @DisplayName("TC-033: Should return all vehicles")
@@ -142,13 +137,11 @@ class VehicleServiceTest {
 
                 () -> assertEquals(
                         "Toyota",
-                        result.get(0).getMake()
-                ),
+                        result.get(0).getMake()),
 
                 () -> assertEquals(
                         "Honda",
-                        result.get(1).getMake()
-                )
+                        result.get(1).getMake())
 
         );
 
@@ -199,13 +192,11 @@ class VehicleServiceTest {
 
                 () -> assertEquals(
                         "Toyota",
-                        result.get(0).getMake()
-                ),
+                        result.get(0).getMake()),
 
                 () -> assertEquals(
                         "Toyota",
-                        result.get(1).getMake()
-                )
+                        result.get(1).getMake())
 
         );
 
@@ -257,13 +248,11 @@ class VehicleServiceTest {
 
                 () -> assertEquals(
                         "Fortuner",
-                        result.get(0).getModel()
-                ),
+                        result.get(0).getModel()),
 
                 () -> assertEquals(
                         "Fortuner",
-                        result.get(1).getModel()
-                )
+                        result.get(1).getModel())
 
         );
 
@@ -315,13 +304,11 @@ class VehicleServiceTest {
 
                 () -> assertEquals(
                         "SUV",
-                        result.get(0).getCategory()
-                ),
+                        result.get(0).getCategory()),
 
                 () -> assertEquals(
                         "SUV",
-                        result.get(1).getCategory()
-                )
+                        result.get(1).getCategory())
 
         );
 
@@ -377,18 +364,91 @@ class VehicleServiceTest {
 
                 () -> assertTrue(
                         result.get(0).getPrice()
-                                .compareTo(minPrice) >= 0
-                ),
+                                .compareTo(minPrice) >= 0),
 
                 () -> assertTrue(
                         result.get(1).getPrice()
-                                .compareTo(maxPrice) <= 0
-                )
+                                .compareTo(maxPrice) <= 0)
 
         );
 
         verify(repository)
                 .searchVehicles(null, null, null, minPrice, maxPrice);
+    }
+
+    @Test
+    @DisplayName("TC-038: Should update vehicle successfully")
+    void shouldUpdateVehicleSuccessfully() {
+
+        // Arrange
+        Vehicle existingVehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category("SUV")
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(10)
+                .build();
+
+        Vehicle updatedVehicle = Vehicle.builder()
+                .make("Toyota")
+                .model("Fortuner Legender")
+                .category("SUV")
+                .price(BigDecimal.valueOf(5000000))
+                .quantity(15)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(existingVehicle));
+
+        when(repository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Vehicle result = service.updateVehicle(1L, updatedVehicle);
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(
+                        "Fortuner Legender",
+                        result.getModel()),
+
+                () -> assertEquals(
+                        BigDecimal.valueOf(5000000),
+                        result.getPrice()),
+
+                () -> assertEquals(
+                        15,
+                        result.getQuantity())
+
+        );
+
+        verify(repository).save(existingVehicle);
+    }
+
+    @Test
+    @DisplayName("TC-039: Should delete vehicle successfully")
+    void shouldDeleteVehicleSuccessfully() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category("SUV")
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(10)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        // Act
+        service.deleteVehicle(1L);
+
+        // Assert
+        verify(repository).delete(vehicle);
     }
 
 }

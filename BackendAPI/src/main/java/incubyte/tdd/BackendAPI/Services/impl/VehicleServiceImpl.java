@@ -56,4 +56,24 @@ public class VehicleServiceImpl
 
     }
 
+    @Override
+    public Vehicle updateVehicle(
+            Long id,
+            Vehicle updatedVehicle
+    ) {
+
+        Vehicle existingVehicle =
+                repository.findById(id)
+                        .orElseThrow();
+
+        existingVehicle.setMake(updatedVehicle.getMake());
+        existingVehicle.setModel(updatedVehicle.getModel());
+        existingVehicle.setCategory(updatedVehicle.getCategory());
+        existingVehicle.setPrice(updatedVehicle.getPrice());
+        existingVehicle.setQuantity(updatedVehicle.getQuantity());
+
+        return repository.save(existingVehicle);
+
+    }
+
 }
