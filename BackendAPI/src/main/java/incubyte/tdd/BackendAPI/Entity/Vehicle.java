@@ -27,4 +27,12 @@ public class Vehicle {
 
     private Integer quantity;
 
+    public void updateDetails(Vehicle updatedVehicle) {
+        this.make = updatedVehicle.getMake();
+        this.model = updatedVehicle.getModel();
+        this.category = updatedVehicle.getCategory();
+        this.price = updatedVehicle.getPrice();
+        this.quantity = updatedVehicle.getQuantity();
+    }
+
 }

@@ -81,11 +81,7 @@ public class VehicleServiceImpl
 
         Vehicle existingVehicle = getVehicleById(id);
 
-        existingVehicle.setMake(updatedVehicle.getMake());
-        existingVehicle.setModel(updatedVehicle.getModel());
-        existingVehicle.setCategory(updatedVehicle.getCategory());
-        existingVehicle.setPrice(updatedVehicle.getPrice());
-        existingVehicle.setQuantity(updatedVehicle.getQuantity());
+        existingVehicle.updateDetails(updatedVehicle);
 
         return repository.save(existingVehicle);
 
@@ -94,11 +90,7 @@ public class VehicleServiceImpl
     @Override
     public void deleteVehicle(Long id) {
 
-        Vehicle vehicle = repository.findById(id)
-                .orElseThrow(() ->
-                        new VehicleNotFoundException(
-                                "Vehicle not found with id: " + id
-                        ));
+        Vehicle vehicle = getVehicleById(id);
 
         repository.delete(vehicle);
 
