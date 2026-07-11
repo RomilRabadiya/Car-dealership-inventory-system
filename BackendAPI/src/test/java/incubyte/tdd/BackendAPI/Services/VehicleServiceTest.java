@@ -182,7 +182,7 @@ class VehicleServiceTest {
                 .make("Toyota")
                 .build();
 
-        when(repository.searchVehicles("Toyota", null, null, null, null))
+        when(repository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
                 .thenReturn(vehicles);
 
         // Act
@@ -204,7 +204,7 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .searchVehicles("Toyota", null, null, null, null);
+                .findAll(any(org.springframework.data.jpa.domain.Specification.class));
     }
 
     @Test
@@ -238,7 +238,7 @@ class VehicleServiceTest {
                 .model("Fortuner")
                 .build();
 
-        when(repository.searchVehicles(null, "Fortuner", null, null, null))
+        when(repository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
                 .thenReturn(vehicles);
 
         // Act
@@ -260,7 +260,7 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .searchVehicles(null, "Fortuner", null, null, null);
+                .findAll(any(org.springframework.data.jpa.domain.Specification.class));
     }
 
     @Test
@@ -294,7 +294,7 @@ class VehicleServiceTest {
                 .category("SUV")
                 .build();
 
-        when(repository.searchVehicles(null, null, "SUV", null, null))
+        when(repository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
                 .thenReturn(vehicles);
 
         // Act
@@ -316,7 +316,7 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .searchVehicles(null, null, "SUV", null, null);
+                .findAll(any(org.springframework.data.jpa.domain.Specification.class));
     }
 
     @Test
@@ -354,7 +354,7 @@ class VehicleServiceTest {
                 .maxPrice(maxPrice)
                 .build();
 
-        when(repository.searchVehicles(null, null, null, minPrice, maxPrice))
+        when(repository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
                 .thenReturn(vehicles);
 
         // Act
@@ -376,7 +376,7 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .searchVehicles(null, null, null, minPrice, maxPrice);
+                .findAll(any(org.springframework.data.jpa.domain.Specification.class));
     }
 
     @Test

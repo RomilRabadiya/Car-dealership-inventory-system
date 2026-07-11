@@ -13,6 +13,7 @@ import incubyte.tdd.BackendAPI.Services.VehicleService;
 import java.math.BigDecimal;
 import java.util.List;
 import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
+import incubyte.tdd.BackendAPI.Specification.VehicleSpecification;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +50,14 @@ public class VehicleServiceImpl
     @Override
     public List<Vehicle> search(VehicleSearchRequest request) {
 
-        return repository.searchVehicles(
-                request.getMake(),
-                request.getModel(),
-                request.getCategory(),
-                request.getMinPrice(),
-                request.getMaxPrice()
+        return repository.findAll(
+                VehicleSpecification.search(
+                        request.getMake(),
+                        request.getModel(),
+                        request.getCategory(),
+                        request.getMinPrice(),
+                        request.getMaxPrice()
+                )
         );
 
     }
