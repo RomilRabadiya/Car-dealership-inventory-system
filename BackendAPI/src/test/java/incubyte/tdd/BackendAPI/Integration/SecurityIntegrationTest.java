@@ -227,4 +227,23 @@ class SecurityIntegrationTest {
                 );
 
     }
+
+
+    @Test
+    @DisplayName("TC-027: ADMIN should delete vehicle successfully")
+    @WithMockUser(
+            username = "admin@gmail.com",
+            roles = "ADMIN"
+    )
+    void shouldAllowDeleteVehicleForAdmin() throws Exception {
+
+        mockMvc.perform(
+
+                        delete("/api/vehicles/1")
+
+                )
+
+                .andExpect(status().isNoContent());
+
+    }
 }
