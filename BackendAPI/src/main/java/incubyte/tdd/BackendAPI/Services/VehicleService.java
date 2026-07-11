@@ -9,5 +9,6 @@ public interface VehicleService {
     Vehicle addVehicle(Vehicle vehicle);
     List<Vehicle> getAllVehicles();
     List<Vehicle> searchByMake(String make);
+    List<Vehicle> searchByModel(String model);
 
 }

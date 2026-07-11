@@ -48,4 +48,11 @@ public class VehicleServiceImpl
 
     }
 
+    @Override
+    public List<Vehicle> searchByModel(String model) {
+
+        return repository.findByModelIgnoreCase(model);
+
+    }
+
 }
