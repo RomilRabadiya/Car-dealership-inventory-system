@@ -57,12 +57,8 @@ public class VehicleServiceImpl
 
     }
 
-    @Override
-    public Vehicle updateVehicle(
-            Long id,
-            Vehicle updatedVehicle
-    ) {
-
+    private Vehicle getVehicleById(Long id)
+    {
         Vehicle existingVehicle =
                 repository.findById(id)
 
@@ -72,6 +68,16 @@ public class VehicleServiceImpl
                                                 "Vehicle not found with id: " + id
                                         )
                         );
+        return existingVehicle;
+    }
+
+    @Override
+    public Vehicle updateVehicle(
+            Long id,
+            Vehicle updatedVehicle
+    ) {
+
+        Vehicle existingVehicle = getVehicleById(id);
 
         existingVehicle.setMake(updatedVehicle.getMake());
         existingVehicle.setModel(updatedVehicle.getModel());
@@ -93,6 +99,22 @@ public class VehicleServiceImpl
                         ));
 
         repository.delete(vehicle);
+
+    }
+
+    @Override
+    public Vehicle restockVehicle(
+            Long id,
+            int quantity
+    ) {
+
+        Vehicle vehicle = getVehicleById(id);
+
+        vehicle.setQuantity(
+                vehicle.getQuantity() + quantity
+        );
+
+        return repository.save(vehicle);
 
     }
 
