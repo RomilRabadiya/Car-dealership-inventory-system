@@ -152,4 +152,59 @@ class VehicleServiceTest {
         verify(repository).findAll();
     }
 
+    @Test
+    @DisplayName("TC-034: Should search vehicles by make")
+    void shouldSearchVehicleByMake() {
+
+        // Arrange
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Toyota")
+                        .model("Innova")
+                        .category("MPV")
+                        .price(BigDecimal.valueOf(3000000))
+                        .quantity(5)
+                        .build()
+
+        );
+
+        when(repository.findByMakeIgnoreCase("Toyota"))
+                .thenReturn(vehicles);
+
+        // Act
+        List<Vehicle> result =
+                service.searchByMake("Toyota");
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(2, result.size()),
+
+                () -> assertEquals(
+                        "Toyota",
+                        result.get(0).getMake()
+                ),
+
+                () -> assertEquals(
+                        "Toyota",
+                        result.get(1).getMake()
+                )
+
+        );
+
+        verify(repository)
+                .findByMakeIgnoreCase("Toyota");
+    }
+
 }
