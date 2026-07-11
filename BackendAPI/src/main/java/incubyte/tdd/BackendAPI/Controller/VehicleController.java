@@ -18,17 +18,6 @@ public class VehicleController {
 
     private final VehicleService service;
 
-
-    @PostMapping("/{id}/restock")
-    public ResponseEntity<Void> restockVehicle(
-            @PathVariable Long id,
-            @RequestParam int quantity
-    ) {
-
-        return ResponseEntity.ok().build();
-
-    }
-
     @PostMapping
     public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
 
@@ -72,6 +61,29 @@ public class VehicleController {
 
         return ResponseEntity.ok(
                 service.search(VehicleSearchRequest.builder().make(make).build())
+        );
+
+    }
+
+    @PostMapping("/{id}/purchase")
+    public ResponseEntity<Vehicle> purchaseVehicle(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(
+                service.purchaseVehicle(id)
+        );
+
+    }
+
+    @PostMapping("/{id}/restock")
+    public ResponseEntity<Vehicle> restockVehicle(
+            @PathVariable Long id,
+            @RequestParam int quantity
+    ) {
+
+        return ResponseEntity.ok(
+                service.restockVehicle(id, quantity)
         );
 
     }
