@@ -521,17 +521,6 @@ class VehicleServiceTest {
     @DisplayName("TC-042: Should reject invalid restock quantity")
     void shouldRejectInvalidRestockQuantity() {
 
-        // Arrange
-        Vehicle vehicle = Vehicle.builder()
-                .id(1L)
-                .make("Toyota")
-                .model("Fortuner")
-                .quantity(10)
-                .build();
-
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(vehicle));
-
         // Act
         InvalidQuantityException exception =
                 assertThrows(
@@ -546,6 +535,41 @@ class VehicleServiceTest {
         );
 
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("TC-045: Should decrease vehicle quantity after purchase")
+    void shouldDecreaseVehicleQuantityAfterPurchase() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .quantity(10)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        when(repository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Vehicle updatedVehicle = service.purchaseVehicle(1L);
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(
+                        9,
+                        updatedVehicle.getQuantity()
+                ),
+
+                () -> verify(repository)
+                        .save(vehicle)
+
+        );
     }
 
 }

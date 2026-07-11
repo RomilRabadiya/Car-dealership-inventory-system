@@ -1,6 +1,7 @@
 package incubyte.tdd.BackendAPI.Services.impl;
 
 import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
+import incubyte.tdd.BackendAPI.Exception.InvalidQuantityException;
 import incubyte.tdd.BackendAPI.Exception.VehicleNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -107,6 +108,12 @@ public class VehicleServiceImpl
             Long id,
             int quantity
     ) {
+
+        if (quantity <= 0) {
+            throw new InvalidQuantityException(
+                    "Restock quantity must be greater than zero."
+            );
+        }
 
         Vehicle vehicle = getVehicleById(id);
 
