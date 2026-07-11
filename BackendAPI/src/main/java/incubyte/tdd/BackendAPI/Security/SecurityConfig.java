@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class AuthorizationSecurityConfig {
+public class SecurityConfig {
 
         // Custom JWT authentication filter
         private final JwtAuthenticationFilter jwtAuthenticationFilter;

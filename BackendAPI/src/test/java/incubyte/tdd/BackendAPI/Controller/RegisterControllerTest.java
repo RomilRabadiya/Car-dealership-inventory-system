@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import incubyte.tdd.BackendAPI.Security.JwtAuthenticationFilter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,10 @@ class RegisterControllerTest {
     // Mock the service layer
     @MockBean
     RegisterService service;
+
+    // Mock JwtAuthenticationFilter since SecurityConfig requires it
+    @MockBean
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // Convert Java objects to JSON
     @Autowired
