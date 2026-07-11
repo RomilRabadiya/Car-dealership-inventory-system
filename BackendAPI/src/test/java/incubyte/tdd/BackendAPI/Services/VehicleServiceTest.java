@@ -522,6 +522,17 @@ class VehicleServiceTest {
     @DisplayName("TC-042: Should reject invalid restock quantity")
     void shouldRejectInvalidRestockQuantity() {
 
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .quantity(10)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
         // Act
         InvalidQuantityException exception =
                 assertThrows(
@@ -531,7 +542,7 @@ class VehicleServiceTest {
 
         // Assert
         assertEquals(
-                "Restock quantity must be greater than zero.",
+                "Quantity must be greater than zero.",
                 exception.getMessage()
         );
 

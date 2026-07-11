@@ -35,4 +35,26 @@ public class Vehicle {
         this.quantity = updatedVehicle.getQuantity();
     }
 
+    public void purchase() {
+        if (this.quantity <= 0) {
+            throw new incubyte.tdd.BackendAPI.Exception.OutOfStockException(
+                    "Vehicle is out of stock."
+            );
+        }
+        this.quantity--;
+    }
+
+    public void restock(int quantity) {
+        validateQuantity(quantity);
+        this.quantity += quantity;
+    }
+
+    private void validateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new incubyte.tdd.BackendAPI.Exception.InvalidQuantityException(
+                    "Quantity must be greater than zero."
+            );
+        }
+    }
+
 }

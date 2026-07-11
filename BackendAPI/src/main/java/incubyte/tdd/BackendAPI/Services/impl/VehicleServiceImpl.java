@@ -102,17 +102,9 @@ public class VehicleServiceImpl
             int quantity
     ) {
 
-        if (quantity <= 0) {
-            throw new InvalidQuantityException(
-                    "Restock quantity must be greater than zero."
-            );
-        }
-
         Vehicle vehicle = getVehicleById(id);
 
-        vehicle.setQuantity(
-                vehicle.getQuantity() + quantity
-        );
+        vehicle.restock(quantity);
 
         return repository.save(vehicle);
     }
@@ -122,15 +114,7 @@ public class VehicleServiceImpl
 
         Vehicle vehicle = getVehicleById(id);
 
-        if (vehicle.getQuantity() <= 0) {
-            throw new OutOfStockException(
-                    "Vehicle is out of stock."
-            );
-        }
-
-        vehicle.setQuantity(
-                vehicle.getQuantity() - 1
-        );
+        vehicle.purchase();
 
         return repository.save(vehicle);
 
