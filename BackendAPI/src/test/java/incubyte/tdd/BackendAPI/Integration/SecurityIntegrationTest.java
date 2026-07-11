@@ -18,6 +18,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -96,5 +98,39 @@ class SecurityIntegrationTest {
                 )
                 .andExpect(status().isUnauthorized());
 
+    }
+
+//    Requirement :
+//    A valid JWT should authenticate the request and allow access to protected endpoints.
+
+//    Request
+//        ↓
+//    Authorization Header
+//    Bearer eyJhbGciOiJIUzI1Ni...
+//        ↓
+//    JwtAuthenticationFilter
+//        ↓
+//    Extract Token
+//        ↓
+//    Validate Token
+//        ↓
+//    Load User
+//        ↓
+//    SecurityContextHolder
+//        ↓
+//    Controller
+
+
+    @Test
+    @DisplayName("TC-023: Should allow authenticated user to access protected endpoint")
+    void shouldAllowAccessWithValidAuthentication() throws Exception {
+
+        mockMvc.perform(
+                        get("/api/vehicles")
+                                .with(user("romil@gmail.com")
+                                        .roles("USER"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Vehicle List"));
     }
 }
