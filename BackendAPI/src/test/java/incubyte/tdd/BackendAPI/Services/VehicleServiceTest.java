@@ -603,4 +603,29 @@ class VehicleServiceTest {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("TC-045: Should throw exception when purchasing non-existing vehicle")
+    void shouldThrowExceptionWhenPurchasingUnknownVehicle() {
+
+        // Arrange
+        Long vehicleId = 100L;
+
+        when(repository.findById(vehicleId))
+                .thenReturn(Optional.empty());
+
+        // Act
+        VehicleNotFoundException exception = assertThrows(
+                VehicleNotFoundException.class,
+                () -> service.purchaseVehicle(vehicleId)
+        );
+
+        // Assert
+        assertEquals(
+                "Vehicle not found with id: 100",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).save(any());
+    }
+
 }
