@@ -7,8 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
-import incubyte.tdd.BackendAPI.Services.Impl.VehicleServiceImpl;
-import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import java.math.BigDecimal;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import incubyte.tdd.BackendAPI.Entity.Vehicle;
+import incubyte.tdd.BackendAPI.Services.impl.VehicleServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class VehicleServiceTest {
