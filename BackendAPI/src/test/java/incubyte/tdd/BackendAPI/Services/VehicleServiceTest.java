@@ -451,4 +451,43 @@ class VehicleServiceTest {
         verify(repository).delete(vehicle);
     }
 
+
+    @Test
+    @DisplayName("TC-040: Should increase vehicle quantity after restocking")
+    void shouldIncreaseVehicleQuantityAfterRestock() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category("SUV")
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(10)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        when(repository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Vehicle updatedVehicle =
+                service.restockVehicle(1L, 5);
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(
+                        15,
+                        updatedVehicle.getQuantity()
+                ),
+
+                () -> verify(repository)
+                        .save(vehicle)
+
+        );
+    }
+
 }

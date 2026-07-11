@@ -1,6 +1,7 @@
 package incubyte.tdd.BackendAPI.Services.impl;
 
 import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
+import incubyte.tdd.BackendAPI.Exception.VehicleNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
@@ -64,7 +65,13 @@ public class VehicleServiceImpl
 
         Vehicle existingVehicle =
                 repository.findById(id)
-                        .orElseThrow();
+
+                        .orElseThrow(
+                                () ->
+                                        new VehicleNotFoundException(
+                                                "Vehicle not found with id: " + id
+                                        )
+                        );
 
         existingVehicle.setMake(updatedVehicle.getMake());
         existingVehicle.setModel(updatedVehicle.getModel());
@@ -80,7 +87,10 @@ public class VehicleServiceImpl
     public void deleteVehicle(Long id) {
 
         Vehicle vehicle = repository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new VehicleNotFoundException(
+                                "Vehicle not found with id: " + id
+                        ));
 
         repository.delete(vehicle);
 
