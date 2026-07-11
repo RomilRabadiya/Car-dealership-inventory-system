@@ -203,4 +203,71 @@ class VehicleControllerTest {
 
     }
 
+//    @Test
+//    @DisplayName("TC-53: Should purchase vehicle")
+//    void shouldPurchaseVehicle() throws Exception {
+//
+//        Vehicle vehicle = Vehicle.builder()
+//                .id(1L)
+//                .make("Toyota")
+//                .model("Fortuner")
+//                .category("SUV")
+//                .price(BigDecimal.valueOf(4500000))
+//                .quantity(9)
+//                .build();
+//
+//        when(service.purchaseVehicle(1L))
+//                .thenReturn(vehicle);
+//
+//        mockMvc.perform(
+//
+//                        post("/api/vehicles/1/purchase")
+//
+//                )
+//
+//                .andExpect(status().isOk())
+//
+//                .andExpect(jsonPath("$.id").value(1))
+//
+//                .andExpect(jsonPath("$.quantity").value(9));
+//
+//        verify(service).purchaseVehicle(1L);
+//
+//    }
+//
+//
+//    @Test
+//    @DisplayName("TC-54: Should restock vehicle")
+//    void shouldRestockVehicle() throws Exception {
+//
+//        Vehicle vehicle = Vehicle.builder()
+//                .id(1L)
+//                .make("Toyota")
+//                .model("Fortuner")
+//                .category("SUV")
+//                .price(BigDecimal.valueOf(4500000))
+//                .quantity(15)
+//                .build();
+//
+//        when(service.restockVehicle(1L, 5))
+//                .thenReturn(vehicle);
+//
+//        mockMvc.perform(
+//
+//                        post("/api/vehicles/1/restock")
+//
+//                                .param("quantity", "5")
+//
+//                )
+//
+//                .andExpect(status().isOk())
+//
+//                .andExpect(jsonPath("$.id").value(1))
+//
+//                .andExpect(jsonPath("$.quantity").value(15));
+//
+//        verify(service).restockVehicle(1L, 5);
+//
+//    }
+
 }

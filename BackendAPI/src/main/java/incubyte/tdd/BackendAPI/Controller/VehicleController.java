@@ -1,11 +1,15 @@
 package incubyte.tdd.BackendAPI.Controller;
 
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Services.VehicleService;
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -14,10 +18,6 @@ public class VehicleController {
 
     private final VehicleService service;
 
-    @GetMapping
-    public ResponseEntity<String> getVehicles() {
-        return ResponseEntity.ok("Vehicle List");
-    }
 
     @PostMapping("/{id}/restock")
     public ResponseEntity<Void> restockVehicle(
@@ -54,5 +54,25 @@ public class VehicleController {
         return ResponseEntity.noContent().build();
     }
 
-    
+    @GetMapping
+    public ResponseEntity<List<Vehicle>> getAllVehicles() {
+
+        return ResponseEntity.ok(
+                service.getAllVehicles()
+        );
+
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Vehicle>> searchVehicles(
+
+            @RequestParam String make
+
+    ) {
+
+        return ResponseEntity.ok(
+                service.search(VehicleSearchRequest.builder().make(make).build())
+        );
+
+    }
 }
