@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 
+import incubyte.tdd.BackendAPI.common.constants.ErrorMessages;
+
 @Entity
 @Getter
 @Setter
@@ -38,7 +40,7 @@ public class Vehicle {
     public void purchase() {
         if (this.quantity <= 0) {
             throw new incubyte.tdd.BackendAPI.Exception.OutOfStockException(
-                    "Vehicle is out of stock."
+                    ErrorMessages.OUT_OF_STOCK
             );
         }
         this.quantity--;
@@ -52,7 +54,7 @@ public class Vehicle {
     private void validateQuantity(int quantity) {
         if (quantity <= 0) {
             throw new incubyte.tdd.BackendAPI.Exception.InvalidQuantityException(
-                    "Quantity must be greater than zero."
+                    ErrorMessages.INVALID_QUANTITY
             );
         }
     }

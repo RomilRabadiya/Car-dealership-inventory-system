@@ -66,6 +66,9 @@ class SecurityIntegrationTest {
     @MockBean
     incubyte.tdd.BackendAPI.Services.VehicleService vehicleService;
 
+    @MockBean
+    incubyte.tdd.BackendAPI.Services.InventoryService inventoryService;
+
     @Autowired
     JwtService jwtService;
 

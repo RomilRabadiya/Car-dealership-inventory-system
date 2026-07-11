@@ -9,6 +9,7 @@ import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Services.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import incubyte.tdd.BackendAPI.common.constants.ErrorMessages;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,7 +43,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     private void validateEmailNotExists(String email) {
         if (repository.existsByEmail(email)) {
-            throw new DuplicateEmailException("Email already exists.");
+            throw new DuplicateEmailException(ErrorMessages.DUPLICATE_EMAIL);
         }
     }
 

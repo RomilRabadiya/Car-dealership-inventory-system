@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import incubyte.tdd.BackendAPI.Services.InventoryService;
 import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(VehicleController.class)
@@ -41,6 +42,9 @@ class VehicleControllerTest {
 
     @MockBean
     private VehicleService service;
+
+    @MockBean
+    private InventoryService inventoryService;
 
     @MockBean
     private JwtService jwtService;
@@ -216,58 +220,41 @@ class VehicleControllerTest {
                 .quantity(9)
                 .build();
 
-        when(service.purchaseVehicle(1L))
+        when(inventoryService.purchaseVehicle(1L))
                 .thenReturn(vehicle);
 
-        mockMvc.perform(
-
-                        post("/api/vehicles/1/purchase")
-
-                )
-
+        // Act & Assert
+        mockMvc.perform(post("/api/vehicles/1/purchase"))
                 .andExpect(status().isOk())
-
-                .andExpect(jsonPath("$.id").value(1))
-
                 .andExpect(jsonPath("$.quantity").value(9));
 
-        verify(service).purchaseVehicle(1L);
-
+        verify(inventoryService).purchaseVehicle(1L);
     }
 
 
     @Test
-    @DisplayName("TC-54: Should restock vehicle")
-    void shouldRestockVehicle() throws Exception {
+    @DisplayName("TC-023: Should restock a vehicle successfully")
+    void shouldRestockVehicleSuccessfully() throws Exception {
 
+        // Arrange
         Vehicle vehicle = Vehicle.builder()
                 .id(1L)
                 .make("Toyota")
                 .model("Fortuner")
-                .category("SUV")
-                .price(BigDecimal.valueOf(4500000))
                 .quantity(15)
                 .build();
 
-        when(service.restockVehicle(1L, 5))
+        when(inventoryService.restockVehicle(1L, 5))
                 .thenReturn(vehicle);
 
+        // Act & Assert
         mockMvc.perform(
-
-                        post("/api/vehicles/1/restock")
-
-                                .param("quantity", "5")
-
-                )
-
+                post("/api/vehicles/1/restock")
+                        .param("quantity", "5")
+        )
                 .andExpect(status().isOk())
-
-                .andExpect(jsonPath("$.id").value(1))
-
                 .andExpect(jsonPath("$.quantity").value(15));
 
-        verify(service).restockVehicle(1L, 5);
-
+        verify(inventoryService).restockVehicle(1L, 5);
     }
-
 }

@@ -3,7 +3,7 @@ package incubyte.tdd.BackendAPI.Controller;
 import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Services.VehicleService;
-import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
+import incubyte.tdd.BackendAPI.Services.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,7 @@ import java.util.List;
 public class VehicleController {
 
     private final VehicleService service;
+    private final InventoryService inventoryService;
 
     @PostMapping
     public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
@@ -69,7 +70,7 @@ public class VehicleController {
     ) {
 
         return ResponseEntity.ok(
-                service.purchaseVehicle(id)
+                inventoryService.purchaseVehicle(id)
         );
 
     }
@@ -81,7 +82,7 @@ public class VehicleController {
     ) {
 
         return ResponseEntity.ok(
-                service.restockVehicle(id, quantity)
+                inventoryService.restockVehicle(id, quantity)
         );
 
     }

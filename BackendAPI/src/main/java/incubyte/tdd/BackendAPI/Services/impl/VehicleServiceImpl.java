@@ -15,7 +15,11 @@ import java.util.List;
 import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import incubyte.tdd.BackendAPI.Specification.VehicleSpecification;
 
+import incubyte.tdd.BackendAPI.common.constants.ErrorMessages;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class VehicleServiceImpl
         implements VehicleService {
@@ -70,7 +74,7 @@ public class VehicleServiceImpl
                         .orElseThrow(
                                 () ->
                                         new VehicleNotFoundException(
-                                                "Vehicle not found with id: " + id
+                                                ErrorMessages.VEHICLE_NOT_FOUND + id
                                         )
                         );
         return existingVehicle;
@@ -96,30 +100,6 @@ public class VehicleServiceImpl
         Vehicle vehicle = getVehicleById(id);
 
         repository.delete(vehicle);
-
-    }
-
-    @Override
-    public Vehicle restockVehicle(
-            Long id,
-            int quantity
-    ) {
-
-        Vehicle vehicle = getVehicleById(id);
-
-        vehicle.restock(quantity);
-
-        return repository.save(vehicle);
-    }
-
-    @Override
-    public Vehicle purchaseVehicle(Long id) {
-
-        Vehicle vehicle = getVehicleById(id);
-
-        vehicle.purchase();
-
-        return repository.save(vehicle);
 
     }
 

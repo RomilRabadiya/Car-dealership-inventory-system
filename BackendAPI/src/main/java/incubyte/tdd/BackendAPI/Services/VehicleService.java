@@ -18,11 +18,4 @@ public interface VehicleService {
 
     void deleteVehicle(Long id);
 
-    Vehicle restockVehicle(
-            Long id,
-            int quantity
-    );
-
-    Vehicle purchaseVehicle(Long id);
-
 }
