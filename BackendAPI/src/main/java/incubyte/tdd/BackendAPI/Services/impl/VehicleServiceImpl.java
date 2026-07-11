@@ -7,6 +7,8 @@ import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
 import incubyte.tdd.BackendAPI.Services.VehicleService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class VehicleServiceImpl
@@ -29,6 +31,13 @@ public class VehicleServiceImpl
         }
 
         return repository.save(vehicle);
+
+    }
+
+    @Override
+    public List<Vehicle> getAllVehicles() {
+
+        return repository.findAll();
 
     }
 
