@@ -21,6 +21,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
+//    POST /api/vehicles
+//    Authorization: Bearer eyJhbGciOiJIUzI1Ni...
+//            ↓
+//    JwtAuthenticationFilter
+//            ↓
+//    JwtService.validateToken()
+//            ↓
+//    CustomUserDetailsService
+//            ↓
+//    SecurityContextHolder
+//            ↓
+//    Controller
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityIntegrationTest {
@@ -119,8 +132,6 @@ class SecurityIntegrationTest {
 //    SecurityContextHolder
 //        ↓
 //    Controller
-
-
     @Test
     @DisplayName("TC-023: Should allow authenticated user to access protected endpoint")
     void shouldAllowAccessWithValidAuthentication() throws Exception {
