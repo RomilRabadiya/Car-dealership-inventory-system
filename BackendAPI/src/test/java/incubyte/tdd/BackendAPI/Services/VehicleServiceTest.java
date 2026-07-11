@@ -1,5 +1,6 @@
 package incubyte.tdd.BackendAPI.Services;
 
+import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.DisplayName;
@@ -8,12 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
 import java.math.BigDecimal;
-import static org.mockito.Mockito.when;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Services.impl.VehicleServiceImpl;
 
@@ -60,6 +60,41 @@ class VehicleServiceTest {
 
         );
 
+    }
+
+
+    @Test
+    @DisplayName("TC-032: Should reject duplicate vehicle")
+    void shouldRejectDuplicateVehicle() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .make("Toyota")
+                .model("Fortuner")
+                .category("SUV")
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(10)
+                .build();
+
+        when(repository.existsByMakeAndModel(
+                vehicle.getMake(),
+                vehicle.getModel()
+        )).thenReturn(true);
+
+        // Act
+        DuplicateVehicleException exception =
+                assertThrows(
+                        DuplicateVehicleException.class,
+                        () -> service.addVehicle(vehicle)
+                );
+
+        // Assert
+        assertEquals(
+                "Vehicle already exists.",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).save(any());
     }
 
 }

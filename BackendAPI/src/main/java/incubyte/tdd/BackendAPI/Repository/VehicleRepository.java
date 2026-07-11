@@ -8,4 +8,9 @@ import org.springframework.stereotype.Repository;
 public interface VehicleRepository
         extends JpaRepository<Vehicle, Long> {
 
+    boolean existsByMakeAndModel(
+            String make,
+            String model
+    );
+
 }
