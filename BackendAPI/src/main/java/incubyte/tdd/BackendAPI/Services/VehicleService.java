@@ -16,4 +16,6 @@ public interface VehicleService {
             Vehicle vehicle
     );
 
+    void deleteVehicle(Long id);
+
 }

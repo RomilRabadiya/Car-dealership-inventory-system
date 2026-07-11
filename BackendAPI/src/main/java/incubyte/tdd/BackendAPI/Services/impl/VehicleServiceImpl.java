@@ -76,4 +76,14 @@ public class VehicleServiceImpl
 
     }
 
+    @Override
+    public void deleteVehicle(Long id) {
+
+        Vehicle vehicle = repository.findById(id)
+                .orElseThrow();
+
+        repository.delete(vehicle);
+
+    }
+
 }
