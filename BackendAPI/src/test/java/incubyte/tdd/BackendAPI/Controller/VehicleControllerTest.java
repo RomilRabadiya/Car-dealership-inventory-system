@@ -23,7 +23,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import incubyte.tdd.BackendAPI.Security.JwtService;
+import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+
 @WebMvcTest(VehicleController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class VehicleControllerTest {
 
     @Autowired
@@ -34,6 +40,12 @@ class VehicleControllerTest {
 
     @MockBean
     private VehicleService service;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     @DisplayName("TC-48: Should create vehicle")
