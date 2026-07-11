@@ -2,6 +2,7 @@ package incubyte.tdd.BackendAPI.Services.impl;
 
 import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
 import incubyte.tdd.BackendAPI.Exception.InvalidQuantityException;
+import incubyte.tdd.BackendAPI.Exception.OutOfStockException;
 import incubyte.tdd.BackendAPI.Exception.VehicleNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -128,6 +129,12 @@ public class VehicleServiceImpl
     public Vehicle purchaseVehicle(Long id) {
 
         Vehicle vehicle = getVehicleById(id);
+
+        if (vehicle.getQuantity() <= 0) {
+            throw new OutOfStockException(
+                    "Vehicle is out of stock."
+            );
+        }
 
         vehicle.setQuantity(
                 vehicle.getQuantity() - 1
