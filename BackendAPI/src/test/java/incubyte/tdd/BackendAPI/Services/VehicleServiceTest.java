@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,6 +96,60 @@ class VehicleServiceTest {
         );
 
         verify(repository, never()).save(any());
+    }
+
+
+    @Test
+    @DisplayName("TC-033: Should return all vehicles")
+    void shouldReturnAllVehicles() {
+
+        // Arrange
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Honda")
+                        .model("City")
+                        .category("Sedan")
+                        .price(BigDecimal.valueOf(1800000))
+                        .quantity(8)
+                        .build()
+
+        );
+
+        when(repository.findAll())
+                .thenReturn(vehicles);
+
+        // Act
+        List<Vehicle> result = service.getAllVehicles();
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(2, result.size()),
+
+                () -> assertEquals(
+                        "Toyota",
+                        result.get(0).getMake()
+                ),
+
+                () -> assertEquals(
+                        "Honda",
+                        result.get(1).getMake()
+                )
+
+        );
+
+        verify(repository).findAll();
     }
 
 }
