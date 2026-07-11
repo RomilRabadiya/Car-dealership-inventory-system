@@ -51,6 +51,10 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/auth/**")
                                                 .permitAll()
 
+                                                // Admin only endpoints
+                                                .requestMatchers(HttpMethod.DELETE, "/api/vehicles/**")
+                                                .hasRole("ADMIN")
+
                                                 // All other endpoints require authentication
                                                 .anyRequest()
                                                 .authenticated()
