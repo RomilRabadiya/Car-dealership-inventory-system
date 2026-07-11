@@ -266,4 +266,23 @@ class SecurityIntegrationTest {
                 .andExpect(status().isForbidden());
 
     }
+
+    @Test
+    @DisplayName("TC-029: ADMIN should restock vehicle successfully")
+    @WithMockUser(
+            username = "admin@gmail.com",
+            roles = "ADMIN"
+    )
+    void shouldAllowRestockForAdmin() throws Exception {
+
+        mockMvc.perform(
+
+                        post("/api/vehicles/1/restock")
+                                .param("quantity", "10")
+
+                )
+
+                .andExpect(status().isOk());
+
+    }
 }
