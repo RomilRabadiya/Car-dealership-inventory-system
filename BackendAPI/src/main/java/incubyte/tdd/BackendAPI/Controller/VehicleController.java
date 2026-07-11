@@ -1,17 +1,27 @@
 package incubyte.tdd.BackendAPI.Controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/vehicles")
+@RequiredArgsConstructor
 public class VehicleController {
 
     @GetMapping
-    public ResponseEntity<String> getAllVehicles() {
+    public ResponseEntity<String> getVehicles() {
         return ResponseEntity.ok("Vehicle List");
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVehicle(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.noContent().build();
+
+    }
+
 
 }

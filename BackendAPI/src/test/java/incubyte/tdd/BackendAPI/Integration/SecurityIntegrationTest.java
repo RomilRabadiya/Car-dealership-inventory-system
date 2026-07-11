@@ -26,6 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import org.springframework.security.test.context.support.WithMockUser;
 
 //    POST /api/vehicles
 //    Authorization: Bearer eyJhbGciOiJIUzI1Ni...
@@ -202,5 +204,27 @@ class SecurityIntegrationTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().string("Vehicle List"));
+    }
+
+
+    @Test
+    @DisplayName("TC-026: USER should not delete vehicle")
+    @WithMockUser(
+            username = "romil@gmail.com",
+            roles = "USER"
+    )
+    void shouldRejectDeleteVehicleForUser()
+            throws Exception {
+
+        mockMvc.perform(
+
+                        delete("/api/vehicles/1")
+
+                )
+
+                .andExpect(
+                        status().isForbidden()
+                );
+
     }
 }

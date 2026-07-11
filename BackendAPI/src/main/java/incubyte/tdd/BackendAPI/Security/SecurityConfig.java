@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpMethod;
 
 // Spring Security configuration
 @Configuration
@@ -23,47 +24,47 @@ public class SecurityConfig {
 
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http)
-                throws Exception {
+                        throws Exception {
 
                 http
 
-                        // Disable CSRF for stateless REST APIs
-                        .csrf(AbstractHttpConfigurer::disable)
+                                // Disable CSRF for stateless REST APIs
+                                .csrf(AbstractHttpConfigurer::disable)
 
-                        // Use JWT instead of HTTP sessions
-                        .sessionManagement(session ->
+                                // Use JWT instead of HTTP sessions
+                                .sessionManagement(session ->
 
                                 session.sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS)
+                                                SessionCreationPolicy.STATELESS)
 
-                        )
+                                )
 
-                        // Handle authentication exceptions (return 401 instead of 403)
-                        .exceptionHandling(exceptions -> exceptions
-                                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                        )
+                                // Handle authentication exceptions (return 401 instead of 403)
+                                .exceptionHandling(exceptions -> exceptions
+                                                .authenticationEntryPoint(
+                                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 
-                        // Configure endpoint authorization rules
-                        .authorizeHttpRequests(auth -> auth
+                                // Configure endpoint authorization rules
+                                .authorizeHttpRequests(auth -> auth
 
-                                // Public endpoints
-                                .requestMatchers("/api/auth/**")
-                                .permitAll()
+                                                // Public endpoints
+                                                .requestMatchers("/api/auth/**")
+                                                .permitAll()
 
-                                // All other endpoints require authentication
-                                .anyRequest()
-                                .authenticated()
+                                                // All other endpoints require authentication
+                                                .anyRequest()
+                                                .authenticated()
 
-                        )
+                                )
 
-                        // Execute the JWT filter before Spring's authentication filter
-                        .addFilterBefore(
+                                // Execute the JWT filter before Spring's authentication filter
+                                .addFilterBefore(
 
-                                jwtAuthenticationFilter,
+                                                jwtAuthenticationFilter,
 
-                                UsernamePasswordAuthenticationFilter.class
+                                                UsernamePasswordAuthenticationFilter.class
 
-                        );
+                                );
 
                 return http.build();
         }
