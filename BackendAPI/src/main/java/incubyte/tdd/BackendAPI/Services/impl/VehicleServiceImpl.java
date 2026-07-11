@@ -7,7 +7,9 @@ import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Repository.VehicleRepository;
 import incubyte.tdd.BackendAPI.Services.VehicleService;
 
+import java.math.BigDecimal;
 import java.util.List;
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -42,16 +44,15 @@ public class VehicleServiceImpl
     }
 
     @Override
-    public List<Vehicle> searchByMake(String make) {
+    public List<Vehicle> search(VehicleSearchRequest request) {
 
-        return repository.findByMakeIgnoreCase(make);
-
-    }
-
-    @Override
-    public List<Vehicle> searchByModel(String model) {
-
-        return repository.findByModelIgnoreCase(model);
+        return repository.searchVehicles(
+                request.getMake(),
+                request.getModel(),
+                request.getCategory(),
+                request.getMinPrice(),
+                request.getMaxPrice()
+        );
 
     }
 

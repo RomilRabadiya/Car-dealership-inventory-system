@@ -13,10 +13,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Services.impl.VehicleServiceImpl;
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 
 @ExtendWith(MockitoExtension.class)
 class VehicleServiceTest {
@@ -179,12 +182,15 @@ class VehicleServiceTest {
 
         );
 
-        when(repository.findByMakeIgnoreCase("Toyota"))
+        VehicleSearchRequest request = VehicleSearchRequest.builder()
+                .make("Toyota")
+                .build();
+
+        when(repository.searchVehicles("Toyota", null, null, null, null))
                 .thenReturn(vehicles);
 
         // Act
-        List<Vehicle> result =
-                service.searchByMake("Toyota");
+        List<Vehicle> result = service.search(request);
 
         // Assert
         assertAll(
@@ -204,7 +210,7 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .findByMakeIgnoreCase("Toyota");
+                .searchVehicles("Toyota", null, null, null, null);
     }
 
     @Test
@@ -234,11 +240,15 @@ class VehicleServiceTest {
 
         );
 
-        when(repository.findByModelIgnoreCase("Fortuner"))
+        VehicleSearchRequest request = VehicleSearchRequest.builder()
+                .model("Fortuner")
+                .build();
+
+        when(repository.searchVehicles(null, "Fortuner", null, null, null))
                 .thenReturn(vehicles);
 
         // Act
-        List<Vehicle> result = service.searchByModel("Fortuner");
+        List<Vehicle> result = service.search(request);
 
         // Assert
         assertAll(
@@ -258,7 +268,127 @@ class VehicleServiceTest {
         );
 
         verify(repository)
-                .findByModelIgnoreCase("Fortuner");
+                .searchVehicles(null, "Fortuner", null, null, null);
+    }
+
+    @Test
+    @DisplayName("TC-036: Should search vehicles by category")
+    void shouldSearchVehicleByCategory() {
+
+        // Arrange
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Mahindra")
+                        .model("Scorpio")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(2200000))
+                        .quantity(5)
+                        .build()
+
+        );
+
+        VehicleSearchRequest request = VehicleSearchRequest.builder()
+                .category("SUV")
+                .build();
+
+        when(repository.searchVehicles(null, null, "SUV", null, null))
+                .thenReturn(vehicles);
+
+        // Act
+        List<Vehicle> result = service.search(request);
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(2, result.size()),
+
+                () -> assertEquals(
+                        "SUV",
+                        result.get(0).getCategory()
+                ),
+
+                () -> assertEquals(
+                        "SUV",
+                        result.get(1).getCategory()
+                )
+
+        );
+
+        verify(repository)
+                .searchVehicles(null, null, "SUV", null, null);
+    }
+
+    @Test
+    @DisplayName("TC-037: Should search vehicles by price range")
+    void shouldSearchVehicleByPriceRange() {
+
+        // Arrange
+        BigDecimal minPrice = BigDecimal.valueOf(1000000);
+        BigDecimal maxPrice = BigDecimal.valueOf(3000000);
+
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Honda")
+                        .model("City")
+                        .category("Sedan")
+                        .price(BigDecimal.valueOf(1800000))
+                        .quantity(8)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Mahindra")
+                        .model("Scorpio")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(2200000))
+                        .quantity(5)
+                        .build()
+
+        );
+
+        VehicleSearchRequest request = VehicleSearchRequest.builder()
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .build();
+
+        when(repository.searchVehicles(null, null, null, minPrice, maxPrice))
+                .thenReturn(vehicles);
+
+        // Act
+        List<Vehicle> result = service.search(request);
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(2, result.size()),
+
+                () -> assertTrue(
+                        result.get(0).getPrice()
+                                .compareTo(minPrice) >= 0
+                ),
+
+                () -> assertTrue(
+                        result.get(1).getPrice()
+                                .compareTo(maxPrice) <= 0
+                )
+
+        );
+
+        verify(repository)
+                .searchVehicles(null, null, null, minPrice, maxPrice);
     }
 
 }

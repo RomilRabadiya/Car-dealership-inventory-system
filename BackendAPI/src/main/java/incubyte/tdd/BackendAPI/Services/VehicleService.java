@@ -1,14 +1,15 @@
 package incubyte.tdd.BackendAPI.Services;
 
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface VehicleService {
 
     Vehicle addVehicle(Vehicle vehicle);
     List<Vehicle> getAllVehicles();
-    List<Vehicle> searchByMake(String make);
-    List<Vehicle> searchByModel(String model);
+    List<Vehicle> search(VehicleSearchRequest request);
 
 }
