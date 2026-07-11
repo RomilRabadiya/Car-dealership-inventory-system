@@ -9,7 +9,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
+import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
 import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -17,9 +20,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -115,6 +116,91 @@ class VehicleControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(service).deleteVehicle(1L);
+    }
+
+    @Test
+    @DisplayName("TC-51: Should return all vehicles")
+    void shouldReturnAllVehicles() throws Exception {
+
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Honda")
+                        .model("City")
+                        .category("Sedan")
+                        .price(BigDecimal.valueOf(1800000))
+                        .quantity(5)
+                        .build()
+
+        );
+
+        when(service.getAllVehicles())
+                .thenReturn(vehicles);
+
+        mockMvc.perform(
+
+                        get("/api/vehicles")
+
+                )
+
+                .andExpect(status().isOk())
+
+                .andExpect(jsonPath("$.length()").value(2))
+
+                .andExpect(jsonPath("$[0].make").value("Toyota"))
+
+                .andExpect(jsonPath("$[1].make").value("Honda"));
+
+        verify(service).getAllVehicles();
+
+    }
+
+    @Test
+    @DisplayName("TC-52: Should search vehicles by make")
+    void shouldSearchVehiclesByMake() throws Exception {
+
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build()
+
+        );
+
+        when(service.search(any(VehicleSearchRequest.class)))
+                .thenReturn(vehicles);
+
+        mockMvc.perform(
+
+                        get("/api/vehicles/search")
+
+                                .param("make", "Toyota")
+
+                )
+
+                .andExpect(status().isOk())
+
+                .andExpect(jsonPath("$.length()").value(1))
+
+                .andExpect(jsonPath("$[0].make").value("Toyota"));
+
+        verify(service).search(any(VehicleSearchRequest.class));
+
     }
 
 }
