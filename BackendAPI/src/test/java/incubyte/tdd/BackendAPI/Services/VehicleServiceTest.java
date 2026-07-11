@@ -2,6 +2,7 @@ package incubyte.tdd.BackendAPI.Services;
 
 import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
 import incubyte.tdd.BackendAPI.Exception.InvalidQuantityException;
+import incubyte.tdd.BackendAPI.Exception.OutOfStockException;
 import incubyte.tdd.BackendAPI.Exception.VehicleNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -538,7 +539,7 @@ class VehicleServiceTest {
     }
 
     @Test
-    @DisplayName("TC-045: Should decrease vehicle quantity after purchase")
+    @DisplayName("TC-043: Should decrease vehicle quantity after purchase")
     void shouldDecreaseVehicleQuantityAfterPurchase() {
 
         // Arrange
@@ -570,6 +571,36 @@ class VehicleServiceTest {
                         .save(vehicle)
 
         );
+    }
+
+    @Test
+    @DisplayName("TC-044: Should reject purchase when stock is zero")
+    void shouldRejectPurchaseWhenStockIsZero() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .quantity(0)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        // Act
+        OutOfStockException exception = assertThrows(
+                OutOfStockException.class,
+                () -> service.purchaseVehicle(1L)
+        );
+
+        // Assert
+        assertEquals(
+                "Vehicle is out of stock.",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).save(any());
     }
 
 }
