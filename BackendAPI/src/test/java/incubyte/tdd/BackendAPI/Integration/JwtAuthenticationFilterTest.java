@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Security.JwtAuthenticationFilter;
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
@@ -50,53 +50,59 @@ class JwtAuthenticationFilterTest {
     void shouldAuthenticateRequestWithValidJwt()
             throws Exception {
 
-        // Arrange
-
+        // Arrange: Create a valid JWT token
         String token = "valid-jwt";
 
-        UserDetails userDetails = User.withUsername("romil@gmail.com")
+        // Create mock user details
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername("romil@gmail.com")
                 .password("password")
                 .roles("USER")
                 .build();
 
+        // Mock the Authorization header
         when(request.getHeader("Authorization"))
                 .thenReturn("Bearer " + token);
 
+        // Mock username extraction from the JWT
         when(jwtService.extractUsername(token))
                 .thenReturn("romil@gmail.com");
 
+        // Mock loading user details from the database
         when(userDetailsService.loadUserByUsername("romil@gmail.com"))
                 .thenReturn(userDetails);
 
+        // Create a user object for token validation
         User user = User.builder()
                 .email("romil@gmail.com")
                 .role(Role.USER)
                 .build();
 
-        when(jwtService.isTokenValid(token, user))
+        // Mock successful JWT validation
+        when(jwtService.isTokenValid(org.mockito.ArgumentMatchers.eq(token), org.mockito.ArgumentMatchers.any(User.class)))
                 .thenReturn(true);
 
-        // Act
-
-        filter.doFilterInternal(
+        // Act: Execute the JWT authentication filter
+        filter.doFilter(
                 request,
                 response,
                 filterChain);
 
-        // Assert
-
+        // Retrieve the authenticated user from the Security Context
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
 
+        // Assert: Verify the user is successfully authenticated
         assertNotNull(authentication);
 
         assertEquals(
                 "romil@gmail.com",
                 authentication.getName());
 
+        // Verify the request continues through the filter chain
         verify(filterChain)
                 .doFilter(request, response);
     }
+
 
 }

@@ -13,6 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import incubyte.tdd.BackendAPI.Entity.Role;
+import incubyte.tdd.BackendAPI.Entity.User;
+import incubyte.tdd.BackendAPI.Repository.UserRepository;
+import incubyte.tdd.BackendAPI.Security.JwtService;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +52,12 @@ class SecurityIntegrationTest {
 
     @MockBean
     RegisterService registerService;
+
+    @MockBean
+    UserRepository userRepository;
+
+    @Autowired
+    JwtService jwtService;
 
     // POST /api/auth/register
     //
@@ -140,6 +152,53 @@ class SecurityIntegrationTest {
                         get("/api/vehicles")
                                 .with(user("romil@gmail.com")
                                         .roles("USER"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Vehicle List"));
+    }
+
+//    Requirement :
+//    A request containing a valid JWT should be authenticated through the Security Filter Chain.
+
+//    HTTP Request
+//        ↓
+//    SecurityFilterChain
+//        ↓
+//    JwtAuthenticationFilter
+//        ↓
+//    JwtService
+//        ↓
+//    CustomUserDetailsService
+//        ↓
+//    SecurityContextHolder
+//        ↓
+//    VehicleController
+
+    @Test
+    @DisplayName("TC-025: Should allow access with valid JWT")
+    void shouldAllowAccessWithValidJwt() throws Exception {
+
+        // Arrange
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .password("encryptedPassword")
+                .role(Role.USER)
+                .build();
+
+        String token = jwtService.generateToken(user);
+
+        when(userRepository.findByEmail("romil@gmail.com"))
+                .thenReturn(Optional.of(user));
+
+        // Act & Assert
+        mockMvc.perform(
+                        get("/api/vehicles")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().string("Vehicle List"));
