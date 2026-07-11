@@ -4,8 +4,6 @@ import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Entity.Role;
 import incubyte.tdd.BackendAPI.Entity.User;
-import incubyte.tdd.BackendAPI.Exception.InvalidCredentialsException;
-import incubyte.tdd.BackendAPI.Exception.UserNotFoundException;
 import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.impl.LoginServiceImpl;
@@ -15,7 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
@@ -26,134 +27,109 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class LoginServiceTest {
 
-        @Mock
-        UserRepository repository;
+    @Mock
+    UserRepository repository;
 
-        @Mock
-        PasswordEncoder encoder;
+    @Mock
+    AuthenticationManager authenticationManager;
 
-        @Mock
-        JwtService jwtService;
+    @Mock
+    JwtService jwtService;
 
-        @InjectMocks
-        LoginServiceImpl service;
+    @InjectMocks
+    LoginServiceImpl service;
 
-        @Test
-        @DisplayName("TC-011: Should login successfully")
-        void shouldLoginSuccessfully() {
+    @Test
+    @DisplayName("TC-011: Should login successfully")
+    void shouldLoginSuccessfully() {
 
-                // Arrange
+        // Arrange
+        LoginRequest request = new LoginRequest(
+                "romil@gmail.com",
+                "password123"
+        );
 
-                LoginRequest request = new LoginRequest(
-                                "romil@gmail.com",
-                                "password123");
+        User user = User.builder()
+                .id(1L)
+                .name("Romil")
+                .email("romil@gmail.com")
+                .password("encryptedPassword")
+                .role(Role.USER)
+                .build();
 
-                User user = User.builder()
+        // mock authentication to do nothing
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(null);
 
-                                .id(1L)
+        when(repository.findByEmail(request.getEmail()))
+                .thenReturn(Optional.of(user));
 
-                                .name("Romil")
+        when(jwtService.generateToken(user))
+                .thenReturn("jwt-token");
 
-                                .email("romil@gmail.com")
+        // Act
+        LoginResponse response = service.login(request);
 
-                                .password("encryptedPassword")
+        // Assert
+        assertAll(
+                () -> assertNotNull(response),
+                () -> assertEquals("jwt-token", response.getToken())
+        );
 
-                                .role(Role.USER)
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(repository).findByEmail(request.getEmail());
+        verify(jwtService).generateToken(user);
+    }
 
-                                .build();
+    @Test
+    @DisplayName("TC-012: Should throw exception when email does not exist (post-auth)")
+    void shouldThrowExceptionWhenEmailDoesNotExist() {
 
-                when(repository.findByEmail(request.getEmail()))
-                                .thenReturn(Optional.of(user));
+        // Arrange
+        LoginRequest request = new LoginRequest(
+                "romil@gmail.com",
+                "password123"
+        );
 
-                when(
-                                encoder.matches(
-                                                request.getPassword(),
-                                                user.getPassword()))
-                                .thenReturn(true);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(null);
 
-                when(jwtService.generateToken(user))
-                                .thenReturn("jwt-token");
+        when(repository.findByEmail(request.getEmail()))
+                .thenReturn(Optional.empty());
 
-                // Act
+        // Act & Assert
+        UsernameNotFoundException exception = assertThrows(
+                UsernameNotFoundException.class,
+                () -> service.login(request)
+        );
 
-                LoginResponse response = service.login(request);
+        assertEquals("User not found.", exception.getMessage());
 
-                // Assert
+        verify(jwtService, never()).generateToken(any());
+    }
 
-                assertAll(
+    @Test
+    @DisplayName("TC-013: Should throw exception for incorrect credentials")
+    void shouldThrowExceptionForIncorrectCredentials() {
 
-                                () -> assertNotNull(response),
+        // Arrange
+        LoginRequest request = new LoginRequest(
+                "romil@gmail.com",
+                "wrongPassword"
+        );
 
-                                () -> assertEquals(
-                                                "jwt-token",
-                                                response.getToken())
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
 
-                );
+        // Act & Assert
+        BadCredentialsException exception = assertThrows(
+                BadCredentialsException.class,
+                () -> service.login(request)
+        );
 
-        }
+        assertEquals("Bad credentials", exception.getMessage());
 
-        @Test
-        @DisplayName("TC-012: Should throw exception when email does not exist")
-        void shouldThrowExceptionWhenEmailDoesNotExist() {
-
-                // Arrange
-                LoginRequest request = new LoginRequest(
-                                "romil@gmail.com",
-                                "password123");
-
-                when(repository.findByEmail(request.getEmail()))
-                                .thenReturn(Optional.empty());
-
-                // Act & Assert
-                UserNotFoundException exception = assertThrows(
-                                UserNotFoundException.class,
-                                () -> service.login(request));
-
-                assertEquals(
-                                "User not found.",
-                                exception.getMessage());
-
-                verify(jwtService, never())
-                                .generateToken(any());
-
-        }
-
-        @Test
-        @DisplayName("TC-013: Should throw exception for incorrect password")
-        void shouldThrowExceptionForIncorrectPassword() {
-
-                // Arrange
-                LoginRequest request = new LoginRequest(
-                                "romil@gmail.com",
-                                "wrongPassword");
-
-                User user = User.builder()
-                                .id(1L)
-                                .name("Romil")
-                                .email("romil@gmail.com")
-                                .password("encryptedPassword")
-                                .role(Role.USER)
-                                .build();
-
-                when(repository.findByEmail(request.getEmail()))
-                                .thenReturn(Optional.of(user));
-
-                when(encoder.matches(
-                                request.getPassword(),
-                                user.getPassword())).thenReturn(false);
-
-                // Act
-                InvalidCredentialsException exception = assertThrows(
-                                InvalidCredentialsException.class,
-                                () -> service.login(request));
-
-                // Assert
-                assertEquals(
-                                "Invalid email or password.",
-                                exception.getMessage());
-
-                verify(jwtService, never())
-                                .generateToken(any());
-        }
-
+        verify(repository, never()).findByEmail(any());
+        verify(jwtService, never()).generateToken(any());
+    }
 }

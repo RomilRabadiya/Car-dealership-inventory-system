@@ -9,7 +9,9 @@ import incubyte.tdd.BackendAPI.Repository.UserRepository;
 import incubyte.tdd.BackendAPI.Security.JwtService;
 import incubyte.tdd.BackendAPI.Services.LoginService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,21 +19,38 @@ import org.springframework.stereotype.Service;
 public class LoginServiceImpl implements LoginService {
 
     private final UserRepository repository;
-    private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
     @Override
     public LoginResponse login(LoginRequest request) {
 
-        User user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("User not found."));
+        authenticate(request);
 
-        if (!encoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid email or password.");
-        }
+        User user = findUserByEmail(request.getEmail());
 
-        String token = jwtService.generateToken(user);
+        String token = generateJwt(user);
 
         return new LoginResponse(token);
+    }
+
+    private void authenticate(LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+    }
+
+    private User findUserByEmail(String email) {
+        return repository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found.")
+                );
+    }
+
+    private String generateJwt(User user) {
+        return jwtService.generateToken(user);
     }
 }
