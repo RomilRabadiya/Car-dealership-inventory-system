@@ -207,4 +207,58 @@ class VehicleServiceTest {
                 .findByMakeIgnoreCase("Toyota");
     }
 
+    @Test
+    @DisplayName("TC-035: Should search vehicles by model")
+    void shouldSearchVehicleByModel() {
+
+        // Arrange
+        List<Vehicle> vehicles = List.of(
+
+                Vehicle.builder()
+                        .id(1L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4500000))
+                        .quantity(10)
+                        .build(),
+
+                Vehicle.builder()
+                        .id(2L)
+                        .make("Toyota")
+                        .model("Fortuner")
+                        .category("SUV")
+                        .price(BigDecimal.valueOf(4700000))
+                        .quantity(8)
+                        .build()
+
+        );
+
+        when(repository.findByModelIgnoreCase("Fortuner"))
+                .thenReturn(vehicles);
+
+        // Act
+        List<Vehicle> result = service.searchByModel("Fortuner");
+
+        // Assert
+        assertAll(
+
+                () -> assertEquals(2, result.size()),
+
+                () -> assertEquals(
+                        "Fortuner",
+                        result.get(0).getModel()
+                ),
+
+                () -> assertEquals(
+                        "Fortuner",
+                        result.get(1).getModel()
+                )
+
+        );
+
+        verify(repository)
+                .findByModelIgnoreCase("Fortuner");
+    }
+
 }
