@@ -23,5 +23,13 @@ public class VehicleController {
 
     }
 
+    @PostMapping("/{id}/restock")
+    public ResponseEntity<Void> restockVehicle(
+            @PathVariable Long id,
+            @RequestParam int quantity
+    ) {
 
+        return ResponseEntity.ok().build();
+
+    }
 }
