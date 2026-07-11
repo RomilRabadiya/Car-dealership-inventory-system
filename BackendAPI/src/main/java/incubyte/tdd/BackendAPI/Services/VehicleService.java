@@ -8,6 +8,6 @@ public interface VehicleService {
 
     Vehicle addVehicle(Vehicle vehicle);
     List<Vehicle> getAllVehicles();
-    List<Vehicle> findByMakeIgnoreCase(String make);
+    List<Vehicle> searchByMake(String make);
 
 }

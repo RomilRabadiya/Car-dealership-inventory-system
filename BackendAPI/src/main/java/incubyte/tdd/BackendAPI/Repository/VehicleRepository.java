@@ -13,4 +13,6 @@ public interface VehicleRepository
             String model
     );
 
+    java.util.List<Vehicle> findByMakeIgnoreCase(String make);
+
 }

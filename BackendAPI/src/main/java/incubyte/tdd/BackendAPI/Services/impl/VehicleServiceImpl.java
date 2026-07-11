@@ -41,4 +41,11 @@ public class VehicleServiceImpl
 
     }
 
+    @Override
+    public List<Vehicle> searchByMake(String make) {
+
+        return repository.findByMakeIgnoreCase(make);
+
+    }
+
 }
