@@ -1,6 +1,8 @@
 package incubyte.tdd.BackendAPI.Services;
 
 import incubyte.tdd.BackendAPI.Exception.DuplicateVehicleException;
+import incubyte.tdd.BackendAPI.Exception.InvalidQuantityException;
+import incubyte.tdd.BackendAPI.Exception.VehicleNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.DisplayName;
@@ -488,6 +490,62 @@ class VehicleServiceTest {
                         .save(vehicle)
 
         );
+    }
+
+    @Test
+    @DisplayName("TC-041: Should throw exception when restocking non-existing vehicle")
+    void shouldThrowExceptionWhenRestockingUnknownVehicle() {
+
+        // Arrange
+        Long vehicleId = 100L;
+
+        when(repository.findById(vehicleId))
+                .thenReturn(Optional.empty());
+
+        // Act
+        VehicleNotFoundException exception = assertThrows(
+                VehicleNotFoundException.class,
+                () -> service.restockVehicle(vehicleId, 5)
+        );
+
+        // Assert
+        assertEquals(
+                "Vehicle not found with id: 100",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("TC-042: Should reject invalid restock quantity")
+    void shouldRejectInvalidRestockQuantity() {
+
+        // Arrange
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .quantity(10)
+                .build();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        // Act
+        InvalidQuantityException exception =
+                assertThrows(
+                        InvalidQuantityException.class,
+                        () -> service.restockVehicle(1L, 0)
+                );
+
+        // Assert
+        assertEquals(
+                "Restock quantity must be greater than zero.",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).save(any());
     }
 
 }
