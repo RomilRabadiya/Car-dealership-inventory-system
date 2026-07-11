@@ -55,6 +55,12 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.DELETE, "/api/vehicles/**")
                                                 .hasRole("ADMIN")
 
+                                                .requestMatchers(
+                                                        HttpMethod.POST,
+                                                        "/api/vehicles/*/restock"
+                                                )
+                                                .hasRole("ADMIN")
+
                                                 // All other endpoints require authentication
                                                 .anyRequest()
                                                 .authenticated()
