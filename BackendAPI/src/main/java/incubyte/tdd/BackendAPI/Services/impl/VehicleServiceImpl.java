@@ -122,6 +122,18 @@ public class VehicleServiceImpl
         );
 
         return repository.save(vehicle);
+    }
+
+    @Override
+    public Vehicle purchaseVehicle(Long id) {
+
+        Vehicle vehicle = getVehicleById(id);
+
+        vehicle.setQuantity(
+                vehicle.getQuantity() - 1
+        );
+
+        return repository.save(vehicle);
 
     }
 

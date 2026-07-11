@@ -23,4 +23,6 @@ public interface VehicleService {
             int quantity
     );
 
+    Vehicle purchaseVehicle(Long id);
+
 }
