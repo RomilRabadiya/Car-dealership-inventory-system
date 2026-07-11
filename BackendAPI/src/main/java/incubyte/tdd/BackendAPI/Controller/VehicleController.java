@@ -54,13 +54,11 @@ public class VehicleController {
 
     @GetMapping("/search")
     public ResponseEntity<List<Vehicle>> searchVehicles(
-
-            @RequestParam String make
-
+            @ModelAttribute VehicleSearchRequest request
     ) {
 
         return ResponseEntity.ok(
-                service.search(VehicleSearchRequest.builder().make(make).build())
+                service.search(request)
         );
 
     }

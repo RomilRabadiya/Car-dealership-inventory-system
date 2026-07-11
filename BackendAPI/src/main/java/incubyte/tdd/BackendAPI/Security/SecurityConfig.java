@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 // Spring Security configuration
 @Configuration
 @EnableWebSecurity
@@ -21,6 +24,11 @@ public class SecurityConfig {
 
         // Custom JWT authentication filter
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+                return authenticationConfiguration.getAuthenticationManager();
+        }
 
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http)

@@ -42,8 +42,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 //            ↓
 //    Controller
 
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
+@ActiveProfiles("test")
 class SecurityIntegrationTest {
 
     @Autowired
@@ -57,6 +62,9 @@ class SecurityIntegrationTest {
 
     @MockBean
     UserRepository userRepository;
+
+    @MockBean
+    incubyte.tdd.BackendAPI.Services.VehicleService vehicleService;
 
     @Autowired
     JwtService jwtService;
@@ -156,7 +164,7 @@ class SecurityIntegrationTest {
                                         .roles("USER"))
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().string("Vehicle List"));
+                .andExpect(content().json("[]"));
     }
 
 //    Requirement :
@@ -203,7 +211,7 @@ class SecurityIntegrationTest {
                                 )
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().string("Vehicle List"));
+                .andExpect(content().json("[]"));
     }
 
 
