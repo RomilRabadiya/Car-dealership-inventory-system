@@ -1,6 +1,7 @@
 package incubyte.tdd.BackendAPI.Controller;
 
 import incubyte.tdd.BackendAPI.Dto.Request.VehicleSearchRequest;
+import jakarta.validation.Valid;
 import incubyte.tdd.BackendAPI.Entity.Vehicle;
 import incubyte.tdd.BackendAPI.Services.VehicleService;
 import incubyte.tdd.BackendAPI.Services.InventoryService;
@@ -20,7 +21,7 @@ public class VehicleController {
     private final InventoryService inventoryService;
 
     @PostMapping
-    public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<Vehicle> addVehicle(@Valid @RequestBody Vehicle vehicle) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.addVehicle(vehicle));

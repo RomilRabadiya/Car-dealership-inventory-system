@@ -19,8 +19,10 @@ public class VehicleSearchRequest {
 
     private String category;
 
+    @jakarta.validation.constraints.PositiveOrZero(message = "Minimum price must be positive or zero")
     private BigDecimal minPrice;
 
+    @jakarta.validation.constraints.Positive(message = "Maximum price must be positive")
     private BigDecimal maxPrice;
 
 }

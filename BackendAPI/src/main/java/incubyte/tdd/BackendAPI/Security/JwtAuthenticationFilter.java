@@ -2,6 +2,7 @@ package incubyte.tdd.BackendAPI.Security;
 
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 import incubyte.tdd.BackendAPI.Services.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -82,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } catch (Exception e) {
                         // If token is invalid or expired, log it or simply proceed without authentication
                         // The request will be handled by Spring Security and rejected with 401/403
-                        System.out.println("Invalid JWT Token: " + e.getMessage());
+                        log.error("Invalid JWT Token: ", e);
                 }
 
                 // Continue processing the request

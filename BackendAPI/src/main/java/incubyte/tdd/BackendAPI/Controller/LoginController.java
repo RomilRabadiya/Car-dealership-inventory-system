@@ -1,6 +1,7 @@
 package incubyte.tdd.BackendAPI.Controller;
 
 import incubyte.tdd.BackendAPI.Dto.Request.LoginRequest;
+import jakarta.validation.Valid;
 import incubyte.tdd.BackendAPI.Dto.Response.LoginResponse;
 import incubyte.tdd.BackendAPI.Services.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(loginService.login(request));
     }
 

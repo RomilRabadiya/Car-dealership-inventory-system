@@ -14,11 +14,11 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    // Secret key used to sign and verify JWT tokens
-    private static final String SECRET =
-            "12345678901234567890123456789012";
+    @org.springframework.beans.factory.annotation.Value("${jwt.secret:12345678901234567890123456789012}")
+    private String secretKey;
 
-    private long expirationInMillis = 3600000;
+    @org.springframework.beans.factory.annotation.Value("${jwt.expiration:3600000}")
+    private long expirationInMillis;
 
     public void setExpirationInMillis(long expirationInMillis) {
         this.expirationInMillis = expirationInMillis;
@@ -67,7 +67,7 @@ public class JwtServiceImpl implements JwtService {
     private SecretKey getSigningKey() {
 
         return Keys.hmacShaKeyFor(
-                SECRET.getBytes(StandardCharsets.UTF_8)
+                secretKey.getBytes(StandardCharsets.UTF_8)
         );
 
     }

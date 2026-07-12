@@ -17,6 +17,8 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtServiceImpl();
+        jwtService.setExpirationInMillis(3600000);
+        org.springframework.test.util.ReflectionTestUtils.setField(jwtService, "secretKey", "12345678901234567890123456789012");
     }
 
     @Test

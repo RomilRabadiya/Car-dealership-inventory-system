@@ -39,6 +39,15 @@ public class SecurityConfig {
                                 // Disable CSRF for stateless REST APIs
                                 .csrf(AbstractHttpConfigurer::disable)
 
+                                // Enable CORS with default configuration
+                                .cors(org.springframework.security.config.Customizer.withDefaults())
+
+                                // Configure Security Headers
+                                .headers(headers -> headers
+                                        .frameOptions(frameOptions -> frameOptions.deny())
+                                        .xssProtection(xss -> xss.and().contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'")))
+                                )
+
                                 // Use JWT instead of HTTP sessions
                                 .sessionManagement(session ->
 
