@@ -1,11 +1,12 @@
 import apiClient from '../api/axios';
 import { setAuthData, clearAuthData } from '../utils/token';
 
-export const register = async (name, email, password) => {
+export const register = async (name, email, password, role = 'USER') => {
     const response = await apiClient.post('/auth/register', {
         name,
         email,
-        password
+        password,
+        role
     });
     return response.data;
 };

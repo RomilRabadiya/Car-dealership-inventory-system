@@ -56,7 +56,7 @@ const Register = () => {
     setApiError('');
 
     try {
-      await register(formData.name, formData.email, formData.password);
+      await register(formData.name, formData.email, formData.password, formData.role);
       // After successful registration, redirect to login
       navigate('/login', { state: { message: 'Registration successful! Please login.' } });
     } catch (err) {
@@ -117,6 +117,20 @@ const Register = () => {
               onChange={handleChange}
             />
             {errors.password && <p className="error-message">{errors.password}</p>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="role">Role (For Testing)</label>
+            <select
+              id="role"
+              name="role"
+              className="form-input"
+              value={formData.role || 'USER'}
+              onChange={handleChange}
+            >
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
           </div>
 
           <button

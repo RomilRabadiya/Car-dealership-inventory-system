@@ -2,35 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/authService';
 import { getAuthName, getAuthRole } from '../utils/token';
-import { getAllVehicles, searchVehicles } from '../services/vehicleService';
+import { 
+  getAllVehicles, 
+  searchVehicles, 
+  purchaseVehicle,
+  addVehicle,
+  updateVehicle,
+  deleteVehicle,
+  restockVehicle
+} from '../services/vehicleService';
 import VehicleCard from '../components/VehicleCard';
 import SearchFilter from '../components/SearchFilter';
+import VehicleModal from '../components/VehicleModal';
+import RestockModal from '../components/RestockModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const name = getAuthName();
   const role = getAuthRole();
+  const isAdmin = role === 'ADMIN';
 
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Admin Modal States
+  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+  const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  const showSuccess = (msg) => {
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
-
   const fetchVehicles = async () => {
     try {
       setLoading(true);
       setIsSearching(false);
       const data = await getAllVehicles();
-      setVehicles(data);
+      if (Array.isArray(data)) {
+        setVehicles(data);
+      } else {
+        throw new Error("Invalid API response. Expected an array.");
+      }
     } catch (err) {
       setError('Failed to fetch inventory data.');
     } finally {
@@ -40,14 +66,19 @@ const Dashboard = () => {
 
   const handleSearch = async (filters) => {
     try {
+      setError('');
+      setSuccessMessage('');
       setLoading(true);
-      // If there are no filters at all, just fetch all
       if (Object.keys(filters).length === 0) {
         return fetchVehicles();
       }
       setIsSearching(true);
       const data = await searchVehicles(filters);
-      setVehicles(data);
+      if (Array.isArray(data)) {
+        setVehicles(data);
+      } else {
+        throw new Error("Invalid API response. Expected an array.");
+      }
     } catch (err) {
       setError('Failed to perform search.');
     } finally {
@@ -56,7 +87,82 @@ const Dashboard = () => {
   };
 
   const handleClearSearch = () => {
+    setError('');
+    setSuccessMessage('');
     fetchVehicles();
+  };
+
+  const handlePurchase = async (id) => {
+    try {
+      setError('');
+      setSuccessMessage('');
+      const updatedVehicle = await purchaseVehicle(id);
+      setVehicles(prevVehicles => prevVehicles.map(v => v.id === id ? updatedVehicle : v));
+      showSuccess(`Successfully purchased ${updatedVehicle.make} ${updatedVehicle.model}!`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to purchase vehicle. It may be out of stock.');
+    }
+  };
+
+  // --- Admin Logic ---
+
+  const handleOpenAdd = () => {
+    setSelectedVehicle(null);
+    setIsVehicleModalOpen(true);
+  };
+
+  const handleOpenEdit = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsVehicleModalOpen(true);
+  };
+
+  const handleOpenRestock = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsRestockModalOpen(true);
+  };
+
+  const handleVehicleSubmit = async (formData) => {
+    try {
+      setError('');
+      if (selectedVehicle) {
+        // Update
+        const updated = await updateVehicle(selectedVehicle.id, formData);
+        setVehicles(prev => prev.map(v => v.id === selectedVehicle.id ? updated : v));
+        showSuccess('Vehicle updated successfully!');
+      } else {
+        // Add
+        const added = await addVehicle(formData);
+        setVehicles(prev => [...prev, added]);
+        showSuccess('Vehicle added successfully!');
+      }
+      setIsVehicleModalOpen(false);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save vehicle.');
+    }
+  };
+
+  const handleRestockSubmit = async (id, quantity) => {
+    try {
+      setError('');
+      const updated = await restockVehicle(id, quantity);
+      setVehicles(prev => prev.map(v => v.id === id ? updated : v));
+      showSuccess('Vehicle restocked successfully!');
+      setIsRestockModalOpen(false);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to restock vehicle.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this vehicle?')) return;
+    try {
+      setError('');
+      await deleteVehicle(id);
+      setVehicles(prev => prev.filter(v => v.id !== id));
+      showSuccess('Vehicle deleted successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete vehicle.');
+    }
   };
 
   return (
@@ -64,7 +170,7 @@ const Dashboard = () => {
       <nav className="navbar">
         <div className="nav-brand">CarInventory</div>
         <div className="nav-links">
-          <span className="nav-item">Welcome, {name} ({role})</span>
+          <span className="nav-item">Welcome, {name} {isAdmin && '(ADMIN)'}</span>
           <button onClick={handleLogout} className="btn-outline">Logout</button>
         </div>
       </nav>
@@ -72,15 +178,21 @@ const Dashboard = () => {
       <main className="main-content">
         <div className="dashboard-header">
           <h2 className="dashboard-title">Dashboard Overview</h2>
-          <button className="btn-outline" onClick={fetchVehicles}>Refresh</button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            {isAdmin && <button className="btn-primary" style={{ marginTop: 0 }} onClick={handleOpenAdd}>+ Add Vehicle</button>}
+            <button className="btn-outline" onClick={fetchVehicles}>Refresh</button>
+          </div>
         </div>
 
         <SearchFilter onSearch={handleSearch} onClear={handleClearSearch} />
 
-        {error && <div className="error-message" style={{ marginBottom: '1rem' }}>{error}</div>}
+        {error && <div className="error-message" style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid var(--danger)', backgroundColor: '#fff0f0' }}>{error}</div>}
+        {successMessage && <div style={{ color: 'green', fontWeight: 'bold', marginBottom: '1rem', padding: '1rem', border: '1px solid green', backgroundColor: '#f0fff0' }}>{successMessage}</div>}
 
         {loading ? (
-          <div className="empty-state">Loading inventory...</div>
+          <div className="spinner-container">
+            <div className="spinner"></div>
+          </div>
         ) : vehicles.length === 0 ? (
           <div className="empty-state">
             {isSearching ? (
@@ -98,11 +210,34 @@ const Dashboard = () => {
         ) : (
           <div className="vehicle-grid">
             {vehicles.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              <VehicleCard 
+                key={vehicle.id} 
+                vehicle={vehicle} 
+                onPurchase={handlePurchase}
+                isAdmin={isAdmin}
+                onEdit={handleOpenEdit}
+                onRestock={handleOpenRestock}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
       </main>
+
+      {/* Admin Modals */}
+      <VehicleModal 
+        isOpen={isVehicleModalOpen} 
+        onClose={() => setIsVehicleModalOpen(false)} 
+        onSubmit={handleVehicleSubmit}
+        initialData={selectedVehicle}
+      />
+
+      <RestockModal 
+        isOpen={isRestockModalOpen}
+        onClose={() => setIsRestockModalOpen(false)}
+        onSubmit={handleRestockSubmit}
+        vehicle={selectedVehicle}
+      />
     </div>
   );
 };

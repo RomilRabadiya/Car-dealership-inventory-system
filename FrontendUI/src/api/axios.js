@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuthToken } from '../utils/token';
+import { getAuthToken, clearAuthData } from '../utils/token';
 
 const apiClient = axios.create({
     baseURL: '/api',
@@ -18,6 +18,22 @@ apiClient.interceptors.request.use(
         return config;
     },
     (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Add a response interceptor to handle global authentication errors
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            // Token is expired or invalid
+            clearAuthData();
+            // Redirect to login page if we aren't already there
+            if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                window.location.href = '/login';
+            }
+        }
         return Promise.reject(error);
     }
 );
