@@ -39,6 +39,8 @@ public class SecurityConfig {
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
                 configuration.setAllowedOriginPatterns(List.of("https://car-dealership-inventory-system-pi.vercel.app",
+                                "https://car-dealership-inventory-system-8uk7zf65g.vercel.app",
+                                "https://car-dealership-inventory-system-*.vercel.app",
                                 "http://localhost:5173", "http://localhost:5174"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(List.of("*"));
