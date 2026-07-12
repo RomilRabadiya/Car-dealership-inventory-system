@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../services/authService';
+import { toast } from 'sonner';
+import Spinner from '../components/Spinner';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'USER'
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState('');
 
   const navigate = useNavigate();
 
@@ -45,7 +47,6 @@ const Register = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    if (apiError) setApiError('');
   };
 
   const handleSubmit = async (e) => {
@@ -53,14 +54,13 @@ const Register = () => {
     if (!validate()) return;
 
     setIsSubmitting(true);
-    setApiError('');
 
     try {
       await register(formData.name, formData.email, formData.password, formData.role);
       // After successful registration, redirect to login
       navigate('/login', { state: { message: 'Registration successful! Please login.' } });
     } catch (err) {
-      setApiError(err.response?.data?.message || 'An error occurred during registration. Please try again.');
+      toast.error(err.response?.data?.message || 'An error occurred during registration. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,8 +73,6 @@ const Register = () => {
           <h1 className="auth-title">Create Account</h1>
           <p className="auth-subtitle">Join us to manage your car inventory</p>
         </div>
-
-        {apiError && <div className="error-message" style={{ marginBottom: '1rem', textAlign: 'center' }}>{apiError}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -135,10 +133,10 @@ const Register = () => {
 
           <button
             type="submit"
-            className="btn-primary"
+            className="btn-primary btn-loading"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Registering...' : 'Register'}
+            {isSubmitting ? <><Spinner size="sm" /> Registering...</> : 'Register'}
           </button>
         </form>
 

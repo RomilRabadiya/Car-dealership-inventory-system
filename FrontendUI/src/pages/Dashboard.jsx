@@ -15,6 +15,9 @@ import VehicleCard from '../components/VehicleCard';
 import SearchFilter from '../components/SearchFilter';
 import VehicleModal from '../components/VehicleModal';
 import RestockModal from '../components/RestockModal';
+import SkeletonLoader from '../components/SkeletonLoader';
+import Spinner from '../components/Spinner';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,9 +27,7 @@ const Dashboard = () => {
 
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   // Admin Modal States
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
@@ -37,10 +38,7 @@ const Dashboard = () => {
     fetchVehicles();
   }, []);
 
-  const showSuccess = (msg) => {
-    setSuccessMessage(msg);
-    setTimeout(() => setSuccessMessage(''), 3000);
-  };
+
 
   const handleLogout = () => {
     logout();
@@ -58,7 +56,7 @@ const Dashboard = () => {
         throw new Error("Invalid API response. Expected an array.");
       }
     } catch (err) {
-      setError('Failed to fetch inventory data.');
+      toast.error('Failed to fetch inventory data.');
     } finally {
       setLoading(false);
     }
@@ -66,8 +64,6 @@ const Dashboard = () => {
 
   const handleSearch = async (filters) => {
     try {
-      setError('');
-      setSuccessMessage('');
       setLoading(true);
       if (Object.keys(filters).length === 0) {
         return fetchVehicles();
@@ -80,27 +76,23 @@ const Dashboard = () => {
         throw new Error("Invalid API response. Expected an array.");
       }
     } catch (err) {
-      setError('Failed to perform search.');
+      toast.error('Failed to perform search.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleClearSearch = () => {
-    setError('');
-    setSuccessMessage('');
     fetchVehicles();
   };
 
   const handlePurchase = async (id) => {
     try {
-      setError('');
-      setSuccessMessage('');
       const updatedVehicle = await purchaseVehicle(id);
       setVehicles(prevVehicles => prevVehicles.map(v => v.id === id ? updatedVehicle : v));
-      showSuccess(`Successfully purchased ${updatedVehicle.make} ${updatedVehicle.model}!`);
+      toast.success(`Successfully purchased ${updatedVehicle.make} ${updatedVehicle.model}!`);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to purchase vehicle. It may be out of stock.');
+      toast.error(err.response?.data?.message || 'Failed to purchase vehicle. It may be out of stock.');
     }
   };
 
@@ -123,45 +115,42 @@ const Dashboard = () => {
 
   const handleVehicleSubmit = async (formData) => {
     try {
-      setError('');
       if (selectedVehicle) {
         // Update
         const updated = await updateVehicle(selectedVehicle.id, formData);
         setVehicles(prev => prev.map(v => v.id === selectedVehicle.id ? updated : v));
-        showSuccess('Vehicle updated successfully!');
+        toast.success('Vehicle updated successfully!');
       } else {
         // Add
         const added = await addVehicle(formData);
         setVehicles(prev => [...prev, added]);
-        showSuccess('Vehicle added successfully!');
+        toast.success('Vehicle added successfully!');
       }
       setIsVehicleModalOpen(false);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save vehicle.');
+      toast.error(err.response?.data?.message || 'Failed to save vehicle.');
     }
   };
 
   const handleRestockSubmit = async (id, quantity) => {
     try {
-      setError('');
       const updated = await restockVehicle(id, quantity);
       setVehicles(prev => prev.map(v => v.id === id ? updated : v));
-      showSuccess('Vehicle restocked successfully!');
+      toast.success('Vehicle restocked successfully!');
       setIsRestockModalOpen(false);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to restock vehicle.');
+      toast.error(err.response?.data?.message || 'Failed to restock vehicle.');
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this vehicle?')) return;
     try {
-      setError('');
       await deleteVehicle(id);
       setVehicles(prev => prev.filter(v => v.id !== id));
-      showSuccess('Vehicle deleted successfully!');
+      toast.success('Vehicle deleted successfully!');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete vehicle.');
+      toast.error(err.response?.data?.message || 'Failed to delete vehicle.');
     }
   };
 
@@ -186,12 +175,11 @@ const Dashboard = () => {
 
         <SearchFilter onSearch={handleSearch} onClear={handleClearSearch} />
 
-        {error && <div className="error-message" style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid var(--danger)', backgroundColor: '#fff0f0' }}>{error}</div>}
-        {successMessage && <div style={{ color: 'green', fontWeight: 'bold', marginBottom: '1rem', padding: '1rem', border: '1px solid green', backgroundColor: '#f0fff0' }}>{successMessage}</div>}
-
         {loading ? (
-          <div className="spinner-container">
-            <div className="spinner"></div>
+          <div className="vehicle-grid">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <SkeletonLoader key={n} />
+            ))}
           </div>
         ) : vehicles.length === 0 ? (
           <div className="empty-state">

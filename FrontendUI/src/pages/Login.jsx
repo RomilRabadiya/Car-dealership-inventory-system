@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../services/authService';
+import { toast } from 'sonner';
+import Spinner from '../components/Spinner';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,16 +12,13 @@ const Login = () => {
   
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (location.state?.message) {
-      setSuccessMessage(location.state.message);
-      // Clear the state so the message doesn't persist on refresh
+      toast.success(location.state.message);
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -50,8 +49,6 @@ const Login = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    if (apiError) setApiError('');
-    if (successMessage) setSuccessMessage('');
   };
 
   const handleSubmit = async (e) => {
@@ -59,8 +56,6 @@ const Login = () => {
     if (!validate()) return;
     
     setIsSubmitting(true);
-    setApiError('');
-    setSuccessMessage('');
     
     try {
       await login(formData.email, formData.password);
@@ -69,9 +64,9 @@ const Login = () => {
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
-        setApiError('Please fix the errors below.');
+        toast.error('Please fix the errors below.');
       } else {
-        setApiError(err.response?.data?.message || 'Invalid email or password.');
+        toast.error(err.response?.data?.message || 'Invalid email or password.');
       }
     } finally {
       setIsSubmitting(false);
@@ -85,9 +80,6 @@ const Login = () => {
           <h1 className="auth-title">Welcome Back</h1>
           <p className="auth-subtitle">Login to access your dashboard</p>
         </div>
-        
-        {successMessage && <div style={{ color: '#10b981', textAlign: 'center', marginBottom: '1rem' }}>{successMessage}</div>}
-        {apiError && <div className="error-message" style={{marginBottom: '1rem', textAlign: 'center'}}>{apiError}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -120,10 +112,10 @@ const Login = () => {
           
           <button 
             type="submit" 
-            className="btn-primary" 
+            className="btn-primary btn-loading" 
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Logging in...' : 'Login'}
+            {isSubmitting ? <><Spinner size="sm" /> Logging in...</> : 'Login'}
           </button>
         </form>
         
