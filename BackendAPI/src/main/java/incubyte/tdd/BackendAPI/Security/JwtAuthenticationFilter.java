@@ -49,34 +49,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Extract the JWT token from the Authorization header
                 String token = header.substring(7);
 
-                // Extract the username (email) from the JWT token
-                String username = jwtService.extractUsername(token);
+                try {
+                        // Extract the username (email) from the JWT token
+                        String username = jwtService.extractUsername(token);
 
-                // Load user details using the extracted username
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        // Load user details using the extracted username
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // Create a user object for token validation
-                User user = User.builder()
-                                .email(userDetails.getUsername())
-                                .build();
+                        // Create a user object for token validation
+                        User user = User.builder()
+                                        .email(userDetails.getUsername())
+                                        .build();
 
-                // Validate the JWT token
-                if (jwtService.isTokenValid(token, user)) {
+                        // Validate the JWT token
+                        if (jwtService.isTokenValid(token, user)) {
 
-                        // Create an authenticated security token
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities());
+                                // Create an authenticated security token
+                                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                                userDetails,
+                                                null,
+                                                userDetails.getAuthorities());
 
-                        // Attach request details to the authentication object
-                        auth.setDetails(
-                                        new WebAuthenticationDetailsSource()
-                                                        .buildDetails(request));
+                                // Attach request details to the authentication object
+                                auth.setDetails(
+                                                new WebAuthenticationDetailsSource()
+                                                                .buildDetails(request));
 
-                        // Store the authenticated user in the Security Context
-                        SecurityContextHolder.getContext()
-                                        .setAuthentication(auth);
+                                // Store the authenticated user in the Security Context
+                                SecurityContextHolder.getContext()
+                                                .setAuthentication(auth);
+                        }
+                } catch (Exception e) {
+                        // If token is invalid or expired, log it or simply proceed without authentication
+                        // The request will be handled by Spring Security and rejected with 401/403
+                        System.out.println("Invalid JWT Token: " + e.getMessage());
                 }
 
                 // Continue processing the request

@@ -24,11 +24,16 @@ public class RegisterServiceImpl implements RegisterService {
         validateRequestNotNull(request);
         validateEmailNotExists(request.getEmail());
 
+        Role assignedRole = Role.USER;
+        if (request.getRole() != null && request.getRole().equalsIgnoreCase("ADMIN")) {
+            assignedRole = Role.ADMIN;
+        }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(encoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(assignedRole)
                 .build();
 
         User savedUser = repository.save(user);
