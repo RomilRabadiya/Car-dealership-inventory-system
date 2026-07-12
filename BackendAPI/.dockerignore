@@ -1,9 +1,5 @@
 .git
 .idea
 .vscode
-src/
-pom.xml
-mvnw
-mvnw.cmd
-.mvn/
+target/
 *.log
