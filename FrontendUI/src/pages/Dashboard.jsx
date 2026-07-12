@@ -1,16 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/authService';
 import { getAuthName, getAuthRole } from '../utils/token';
+import { getAllVehicles } from '../services/vehicleService';
+import VehicleCard from '../components/VehicleCard';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const name = getAuthName();
   const role = getAuthRole();
 
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  const fetchVehicles = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllVehicles();
+      setVehicles(data);
+    } catch (err) {
+      setError('Failed to fetch inventory data.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,14 +46,27 @@ const Dashboard = () => {
       </nav>
       
       <main className="main-content">
-        <div style={{ padding: '2rem', border: '1px solid black' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Dashboard Overview</h2>
-          <p style={{ color: 'var(--text-secondary)' }}>
-            This is a placeholder for the Dashboard (Module 2).
-            <br />
-            Authentication flow works perfectly!
-          </p>
+        <div className="dashboard-header">
+          <h2 className="dashboard-title">Dashboard Overview</h2>
+          <button className="btn-outline" onClick={fetchVehicles}>Refresh</button>
         </div>
+
+        {error && <div className="error-message" style={{ marginBottom: '1rem' }}>{error}</div>}
+
+        {loading ? (
+          <div className="empty-state">Loading inventory...</div>
+        ) : vehicles.length === 0 ? (
+          <div className="empty-state">
+            <h3>No Vehicles Found</h3>
+            <p>Your inventory is currently empty.</p>
+          </div>
+        ) : (
+          <div className="vehicle-grid">
+            {vehicles.map((vehicle) => (
+              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
