@@ -30,14 +30,16 @@ public class SecurityConfig {
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
         @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+                        throws Exception {
                 return authenticationConfiguration.getAuthenticationManager();
         }
 
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOriginPatterns(List.of("https://car-dealership-inventory-system-pi.vercel.app/", "http://localhost:5173", "http://localhost:5174"));
+                configuration.setAllowedOriginPatterns(List.of("https://car-dealership-inventory-system-pi.vercel.app",
+                                "http://localhost:5173", "http://localhost:5174"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(List.of("*"));
                 configuration.setAllowCredentials(true);
@@ -60,9 +62,9 @@ public class SecurityConfig {
 
                                 // Configure Security Headers
                                 .headers(headers -> headers
-                                        .frameOptions(frameOptions -> frameOptions.deny())
-                                        .xssProtection(xss -> xss.and().contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'")))
-                                )
+                                                .frameOptions(frameOptions -> frameOptions.deny())
+                                                .xssProtection(xss -> xss.and().contentSecurityPolicy(
+                                                                csp -> csp.policyDirectives("default-src 'self'"))))
 
                                 // Use JWT instead of HTTP sessions
                                 .sessionManagement(session ->
@@ -89,9 +91,8 @@ public class SecurityConfig {
                                                 .hasRole("ADMIN")
 
                                                 .requestMatchers(
-                                                        HttpMethod.POST,
-                                                        "/api/vehicles/*/restock"
-                                                )
+                                                                HttpMethod.POST,
+                                                                "/api/vehicles/*/restock")
                                                 .hasRole("ADMIN")
 
                                                 // All other endpoints require authentication
