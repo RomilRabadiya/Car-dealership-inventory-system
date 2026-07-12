@@ -269,3 +269,35 @@ body {
   border: 1px dashed var(--border-color);
   color: var(--text-secondary);
 }
+
+/* Search Filter Styles */
+.search-filter-container {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.search-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.search-btn, .clear-btn {
+  padding: 0.75rem 2rem;
+  width: auto;
+  margin-top: 0;
+}
